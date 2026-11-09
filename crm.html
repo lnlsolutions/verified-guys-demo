@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Dashboard — The Verified Guys | LNL Solutions</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/crm.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="side">
+    <div class="side__brand"><img src="assets/img/logo.png" alt=""> Verified Guys</div>
+    <div class="side__lbl">Overview</div>
+    <a class="on" href="#overview">▦ Dashboard</a>
+    <a href="#channels">◔ Channels</a>
+    <div class="side__lbl">Pipeline</div>
+    <a href="#leads">☰ Leads</a>
+    <a href="#projects">▤ Projects</a>
+    <div class="side__lbl">Growth</div>
+    <a href="#funnel">▼ Funnel</a>
+    <a href="#revenue">↗ Revenue</a>
+    <div class="side__lbl">Demo</div>
+    <a href="index.html">◂ Back to site</a>
+    <div class="side__foot">
+      <b>Demo environment</b>
+      Data is illustrative. Built by LNL Solutions.
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <div>
+        <h1>Performance Dashboard</h1>
+        <p>The Verified Guys · Phoenix metro · Last 30 days</p>
+      </div>
+      <div class="top__right">
+        <span class="pill pill--live"><i></i> Live</span>
+        <span class="pill" id="clock">—</span>
+        <button class="btn btn--ghost" id="resetBtn">Reset demo data</button>
+        <a class="btn btn--go" href="index.html">Open site ↗</a>
+      </div>
+    </div>
+
+    <section class="kpis" id="overview"></section>
+
+    <div class="grid2">
+      <section class="panel" id="channels">
+        <div class="panel__h">
+          <h2>Channel performance</h2>
+          <span class="sub">LSA · Google Ads · Meta</span>
+          <span class="right">Last 30 days</span>
+        </div>
+        <div class="panel__b" style="padding:12px 10px 6px">
+          <div class="tablewrap">
+          <table id="chanTable">
+            <thead><tr>
+              <th>Channel</th><th>Spend</th><th>Leads</th><th>CPL</th><th>Booked</th><th>CPA</th><th>Revenue</th>
+            </tr></thead>
+            <tbody></tbody>
+            <tfoot></tfoot>
+          </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="funnel">
+        <div class="panel__h"><h2>Funnel</h2><span class="right">Lead → job</span></div>
+        <div class="panel__b"><div class="funnel" id="funnelBody"></div>
+          <div class="note" id="funnelNote"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="grid2">
+      <section class="panel" id="projects">
+        <div class="panel__h"><h2>Projects in queue</h2><span class="sub">Click a job for status</span>
+          <span class="right" id="jobsCount"></span></div>
+        <div class="panel__b"><div class="board" id="board"></div></div>
+      </section>
+
+      <section class="panel" id="revenue">
+        <div class="panel__h"><h2>Booked revenue</h2><span class="right">Cumulative, 30 days</span></div>
+        <div class="panel__b">
+          <div id="revChart"></div>
+          <div class="note">Won jobs only. Quoted pipeline is tracked separately and excluded from booked revenue.</div>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel" id="leads">
+      <div class="panel__h">
+        <h2>Leads</h2><span class="sub" id="leadCount"></span>
+        <span class="right">Newest first · click to open</span>
+      </div>
+      <div class="panel__b" style="padding:8px 14px 14px">
+        <div class="leadrow" style="cursor:default;border-bottom:1px solid var(--line);padding-bottom:7px">
+          <div class="mut" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Lead</div>
+          <div class="mut" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Source</div>
+          <div class="mut" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Need</div>
+          <div class="mut" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Score</div>
+          <div class="mut" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-align:right">Status</div>
+        </div>
+        <div id="leadList"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer__h">
+    <div><h3 id="dTitle">—</h3><p id="dSub">—</p></div>
+    <button class="drawer__x" id="drawerX">×</button>
+  </div>
+  <div class="drawer__b" id="dBody"></div>
+  <div class="drawer__f">
+    <a class="btn btn--go" id="dCall" href="#">Call</a>
+    <a class="btn btn--ghost" id="dText" href="#">Text</a>
+    <a class="btn btn--ghost" id="dSite" href="index.html">View site</a>
+  </div>
+</aside>
+
+<script src="assets/js/app.js"></script>
+<script src="assets/js/crm.js"></script>
+</body>
+</html>
