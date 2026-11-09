@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Dashboard — The Verified Guys | LNL Solutions</title>
+<title>Admin Portal — The Verified Guys | LNL Solutions</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="assets/img/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,121 +11,202 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/crm.css">
 <link rel="stylesheet" href="assets/css/brand.css">
+<style>
+  .gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(120% 120% at 50% 0%,#1857C5 0%,#0D2D6E 55%,#081c46 100%);padding:24px}
+  .gate__box{width:100%;max-width:400px;background:#fff;border-radius:18px;padding:30px 28px;
+    box-shadow:0 30px 70px -20px rgba(0,0,0,.55);text-align:center}
+  .gate__box img{height:38px;margin:0 auto 16px}
+  .gate__box h1{font-size:20px;margin:0 0 6px;color:#0D2D6E;letter-spacing:-.02em}
+  .gate__box p{font-size:13.5px;color:#5A6B8C;margin:0 0 18px;line-height:1.5}
+  .gate__in{width:100%;padding:13px 14px;border:1px solid #DDE5F5;border-radius:10px;font-size:15px;
+    font-family:inherit;text-align:center;letter-spacing:.14em;font-weight:700;color:#0D2D6E}
+  .gate__in:focus{outline:none;border-color:#3A84F6;box-shadow:0 0 0 3px rgba(58,132,246,.16)}
+  .gate__btn{width:100%;margin-top:12px;padding:13px;border:0;border-radius:10px;cursor:pointer;
+    background:linear-gradient(180deg,#3A84F6,#1857C5);color:#fff;font-weight:750;font-size:15px;font-family:inherit}
+  .gate__err{color:#EF4444;font-size:12.5px;margin-top:10px;min-height:16px}
+  .gate__hint{margin-top:16px;font-size:11.5px;color:#9CA3AF}
+  .gate__hint b{color:#1857C5}
+
+  /* division split */
+  .split{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .spl{border:1px solid #DDE5F5;border-radius:12px;padding:14px 15px;background:#fff}
+  .spl__t{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5A6B8C}
+  .spl__v{font-size:23px;font-weight:800;color:#0D2D6E;letter-spacing:-.02em;margin:3px 0 2px}
+  .spl__m{font-size:12px;color:#5A6B8C}
+  .spl__bar{height:6px;border-radius:99px;background:#EDF2FB;margin-top:10px;overflow:hidden}
+  .spl__bar i{display:block;height:100%;border-radius:99px}
+
+  /* zip heat grid */
+  .zipgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .zt{border-radius:10px;padding:11px 10px;color:#fff;position:relative;overflow:hidden}
+  .zt b{display:block;font-size:14.5px;letter-spacing:.01em}
+  .zt span{font-size:10.5px;opacity:.9;display:block;margin-top:2px}
+  .zt em{position:absolute;right:9px;top:9px;font-style:normal;font-size:10px;font-weight:800;
+    background:rgba(255,255,255,.22);border-radius:99px;padding:2px 7px}
+  .legend{display:flex;align-items:center;gap:8px;font-size:11px;color:#5A6B8C;margin-top:12px}
+  .legend i{width:16px;height:8px;border-radius:99px;display:block}
+
+  /* closer table */
+  .closer{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:8px;padding:11px 12px;
+    border-bottom:1px solid #EDF2FB;align-items:center;font-size:13px}
+  .closer.h{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8798b5;
+    background:#F7F9FE;border-radius:8px 8px 0 0}
+  .closer__n{display:flex;align-items:center;gap:9px;font-weight:700;color:#0D2D6E}
+  .closer__n .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+    font-size:11px;font-weight:800;background:#E8F0FE;color:#1857C5}
+  .pill{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:99px}
+  .pill--ok{background:#E8F7F0;color:#127A4B}
+  .pill--warn{background:#FEF4E6;color:#B25E09}
+  .pill--bad{background:#FDECEC;color:#C02929}
+  @media(max-width:900px){
+    .split{grid-template-columns:1fr}
+    .zipgrid{grid-template-columns:repeat(2,1fr)}
+    .closer{grid-template-columns:1.2fr 1fr 1fr;font-size:12px}
+    .closer > div:nth-child(4),.closer > div:nth-child(5){display:none}
+  }
+</style>
 </head>
 <body>
+<div class="gate" id="gate">
+  <div class="gate__box">
+    <img src="assets/img/logo.png" alt="The Verified Guys">
+    <h1>Admin Portal</h1>
+    <p>Enter the access code to open the reporting dashboard.</p>
+    <form id="gateForm">
+      <input class="gate__in" id="gateCode" type="password" placeholder="ACCESS CODE" autocomplete="off" aria-label="Access code">
+      <button class="gate__btn" type="submit">Open dashboard</button>
+      <div class="gate__err" id="gateErr"></div>
+    </form>
+    <div class="gate__hint">Demo access code: <b>verified2026</b></div>
+  </div>
+</div>
+<script>
+(function(){
+  var CODE='verified2026';
+  var gate=document.getElementById('gate');
+  function unlock(){ gate.style.display='none'; document.body.style.overflow=''; }
+  try{ if(sessionStorage.getItem('vg_portal')==='ok') unlock(); }catch(e){}
+  document.getElementById('gateForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var v=document.getElementById('gateCode').value.trim().toLowerCase();
+    if(v===CODE){ try{sessionStorage.setItem('vg_portal','ok')}catch(e){} unlock(); }
+    else { document.getElementById('gateErr').textContent='That code is not right.'; }
+  });
+})();
+</script>
+
 <div class="layout">
   <aside class="side">
     <div class="side__brand"><img src="assets/img/logo.png" alt=""> Verified Guys</div>
-    <div class="side__lbl">Overview</div>
-    <a class="on" href="#overview">▦ Dashboard</a>
+    <div class="side__lbl">Daily</div>
+    <a class="on" href="#overview">▦ Morning view</a>
+    <a href="#followup">◷ Needs follow-up</a>
+    <a href="#divisions">◨ Divisions</a>
+    <div class="side__lbl">Marketing</div>
     <a href="#channels">◔ Channels</a>
-    <div class="side__lbl">Pipeline</div>
+    <a href="#zips">⌖ ZIP performance</a>
+    <div class="side__lbl">Sales</div>
+    <a href="#closers">☗ Closers</a>
     <a href="#leads">☰ Leads</a>
     <a href="#projects">▤ Projects</a>
-    <div class="side__lbl">Growth</div>
-    <a href="#funnel">▼ Funnel</a>
-    <a href="#revenue">↗ Revenue</a>
-    <div class="side__lbl">Demo</div>
-    <a href="index.html">◂ Back to site</a>
+    <div class="side__lbl">Reputation</div>
+    <a href="#reviews">★ Reviews</a>
     <div class="side__foot">
-      <b>Demo environment</b>
-      Data is illustrative. Built by LNL Solutions.
+      <div class="side__live"><span class="live"></span> Demo data · 30 days</div>
+      <div style="margin-top:8px;font-size:11px;color:#8798b5">LNL Solutions build</div>
     </div>
   </aside>
 
   <main class="main">
     <div class="top">
       <div>
-        <h1>Performance Dashboard</h1>
-        <p>The Verified Guys · Phoenix metro · Last 30 days</p>
+        <div class="top__k">Morning view · last 30 days</div>
+        <h1>Where your attention goes today</h1>
       </div>
       <div class="top__right">
-        <span class="pill pill--live"><i></i> Live</span>
-        <span class="pill" id="clock">—</span>
-        <button class="btn btn--ghost" id="resetBtn">Reset demo data</button>
-        <a class="btn btn--go" href="index.html">Open site ↗</a>
+        <div class="top__live"><span class="live"></span> Live</div>
+        <button class="btn sm" id="resetBtn" type="button">Reset demo</button>
       </div>
     </div>
 
-    <section class="kpis" id="overview"></section>
+    <div class="kpis" id="kpis"></div>
 
-    <div class="grid2">
-      <section class="panel" id="channels">
-        <div class="panel__h">
-          <h2>Channel performance</h2>
-          <span class="sub">LSA · Google Ads · Meta</span>
-          <span class="right">Last 30 days</span>
+    <div class="grid2" style="margin-top:14px">
+      <section class="panel" id="followup">
+        <div class="panel__h"><h2>Needs follow-up today</h2><span class="panel__s">Oldest waiting first</span></div>
+        <div class="panel__b" id="followupList"></div>
+      </section>
+      <section class="panel" id="divisions">
+        <div class="panel__h"><h2>Revenue by division</h2><span class="panel__s">This month</span></div>
+        <div class="panel__b">
+          <div class="split" id="split"></div>
+          <div class="legend"><i style="background:#3A84F6"></i> Roofing <i style="background:#F5B73B;margin-left:10px"></i> Electrical / EV <i style="background:#12B76A;margin-left:10px"></i> Solar</div>
         </div>
-        <div class="panel__b" style="padding:12px 10px 6px">
-          <div class="tablewrap">
+      </section>
+    </div>
+
+    <section class="panel" id="channels" style="margin-top:14px">
+      <div class="panel__h"><h2>Ad spend and cost per estimate</h2><span class="panel__s">LSA · Google · Meta</span></div>
+      <div class="panel__b" style="padding:12px 10px 6px">
+        <div class="tablewrap">
           <table id="chanTable">
             <thead><tr>
-              <th>Channel</th><th>Spend</th><th>Leads</th><th>CPL</th><th>Booked</th><th>CPA</th><th>Revenue</th>
+              <th>Campaign</th><th>Spend</th><th>Leads</th><th>Estimates</th>
+              <th>Shows</th><th>Closed</th><th>Cost / est.</th><th>Revenue</th>
             </tr></thead>
             <tbody></tbody>
-            <tfoot></tfoot>
           </table>
-          </div>
         </div>
-      </section>
-
-      <section class="panel" id="funnel">
-        <div class="panel__h"><h2>Funnel</h2><span class="right">Lead → job</span></div>
-        <div class="panel__b"><div class="funnel" id="funnelBody"></div>
-          <div class="note" id="funnelNote"></div>
-        </div>
-      </section>
-    </div>
-
-    <div class="grid2">
-      <section class="panel" id="projects">
-        <div class="panel__h"><h2>Projects in queue</h2><span class="sub">Click a job for status</span>
-          <span class="right" id="jobsCount"></span></div>
-        <div class="panel__b"><div class="board" id="board"></div></div>
-      </section>
-
-      <section class="panel" id="revenue">
-        <div class="panel__h"><h2>Booked revenue</h2><span class="right">Cumulative, 30 days</span></div>
-        <div class="panel__b">
-          <div id="revChart"></div>
-          <div class="note">Won jobs only. Quoted pipeline is tracked separately and excluded from booked revenue.</div>
-        </div>
-      </section>
-    </div>
-
-    <section class="panel" id="leads">
-      <div class="panel__h">
-        <h2>Leads</h2><span class="sub" id="leadCount"></span>
-        <span class="right">Newest first · click to open</span>
-      </div>
-      <div class="panel__b" style="padding:8px 14px 14px">
-        <div class="leadrow" style="cursor:default;border-bottom:1px solid var(--line);padding-bottom:7px">
-          <div class="mut" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Lead</div>
-          <div class="mut" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Source</div>
-          <div class="mut" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Need</div>
-          <div class="mut" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Score</div>
-          <div class="mut" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-align:right">Status</div>
-        </div>
-        <div id="leadList"></div>
       </div>
     </section>
+
+    <div class="grid2" style="margin-top:14px">
+      <section class="panel" id="zips">
+        <div class="panel__h"><h2>ZIP performance</h2><span class="panel__s">Your priority areas</span></div>
+        <div class="panel__b">
+          <div class="zipgrid" id="zipgrid"></div>
+          <div class="legend"><i style="background:#0D2D6E"></i> Lowest volume <i style="background:#3A84F6;margin-left:10px"></i> Hot</div>
+        </div>
+      </section>
+      <section class="panel" id="closers">
+        <div class="panel__h"><h2>Closer accountability</h2><span class="panel__s">Speed and conversion</span></div>
+        <div class="panel__b" style="padding:10px 8px">
+          <div class="closer h"><div>Closer</div><div>Leads</div><div>Avg response</div><div>Close rate</div><div>Revenue</div></div>
+          <div id="closerRows"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="grid2" style="margin-top:14px">
+      <section class="panel" id="reviews">
+        <div class="panel__h"><h2>New Google reviews</h2><span class="panel__s">Tracked monthly</span></div>
+        <div class="panel__b" id="reviewBox"></div>
+      </section>
+      <section class="panel">
+        <div class="panel__h"><h2>Lead funnel</h2><span class="panel__s">Lead to closed job</span></div>
+        <div class="panel__b" id="funnel"></div>
+      </section>
+    </div>
+
+    <section class="panel" id="projects" style="margin-top:14px">
+      <div class="panel__h"><h2>Projects in production</h2><span class="panel__s">Click any job for its status</span></div>
+      <div class="panel__b">
+        <div class="boardwrap"><div class="board" id="board"></div></div>
+      </div>
+    </section>
+
+    <section class="panel" id="leads" style="margin-top:14px">
+      <div class="panel__h"><h2>Leads</h2><span class="panel__s">Newest first · chat leads appear live</span></div>
+      <div class="panel__b" style="padding:6px 10px 10px"><div id="leadList"></div></div>
+    </section>
+
+    <div style="height:30px"></div>
   </main>
 </div>
 
 <div class="scrim" id="scrim"></div>
-<aside class="drawer" id="drawer">
-  <div class="drawer__h">
-    <div><h3 id="dTitle">—</h3><p id="dSub">—</p></div>
-    <button class="drawer__x" id="drawerX">×</button>
-  </div>
-  <div class="drawer__b" id="dBody"></div>
-  <div class="drawer__f">
-    <a class="btn btn--go" id="dCall" href="#">Call</a>
-    <a class="btn btn--ghost" id="dText" href="#">Text</a>
-    <a class="btn btn--ghost" id="dSite" href="index.html">View site</a>
-  </div>
-</aside>
-
+<aside class="drawer" id="drawer"></aside>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/crm.js"></script>
 </body>

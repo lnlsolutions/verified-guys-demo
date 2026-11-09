@@ -1,195 +1,214 @@
-/* CRM dashboard — reads the shared demo store */
+/* Admin portal — tailored to The Verified Guys discovery questionnaire.
+   Numbers anchored to what the owners reported: 16% lead-to-close,
+   $23,000 average reroof, $817 average EV charger job. */
 (function () {
   'use strict';
   const $ = s => document.querySelector(s);
   const fmt$ = n => '$' + Math.round(n).toLocaleString('en-US');
-  const fmt2 = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const store = window.VG.store;
 
-  /* Campaign truth: matches the numbers presented to the client */
+  /* ── campaign data (30 days) ─────────────────────────────── */
   const CHANNELS = [
-    { name: 'Local Services Ads', short: 'LSA', color: '#2E90FA', spend: 2250, leads: 12, booked: 3, revenue: 16800 },
-    { name: 'Google Ads', short: 'Google', color: '#12B76A', spend: 1250, leads: 7, booked: 2, revenue: 14300 },
-    { name: 'Meta Ads', short: 'Meta', color: '#7A5AF8', spend: 1000, leads: 7, booked: 1, revenue: 6300 }
+    { name: 'Local Services Ads', short: 'LSA', color: '#3A84F6', spend: 2000, leads: 22, est: 17, shows: 14, closed: 5, revenue: 70634 },
+    { name: 'Google Ads', short: 'Google', color: '#F5B73B', spend: 1600, leads: 58, est: 34, shows: 26, closed: 9, revenue: 29536 },
+    { name: 'Meta Ads', short: 'Meta', color: '#12B76A', spend: 900, leads: 30, est: 19, shows: 12, closed: 4, revenue: 20451 }
+  ];
+  const TOT = CHANNELS.reduce((a, c) => ({
+    spend: a.spend + c.spend, leads: a.leads + c.leads, est: a.est + c.est,
+    shows: a.shows + c.shows, closed: a.closed + c.closed, revenue: a.revenue + c.revenue
+  }), { spend: 0, leads: 0, est: 0, shows: 0, closed: 0, revenue: 0 });
+
+  /* ── division split ──────────────────────────────────────── */
+  const DIVISIONS = [
+    { name: 'Roofing', value: 92000, jobs: 4, color: '#3A84F6', avg: 23000 },
+    { name: 'Electrical / EV', value: 10621, jobs: 13, color: '#F5B73B', avg: 817 },
+    { name: 'Solar', value: 18000, jobs: 1, color: '#12B76A', avg: 18000 }
+  ];
+  const DIV_TOTAL = DIVISIONS.reduce((s, d) => s + d.value, 0);
+
+  /* ── ZIP performance ─────────────────────────────────────── */
+  const ZIPS = [
+    { zip: '85254', div: 'Roof', leads: 11, est: 8, closed: 2 },
+    { zip: '85258', div: 'Roof', leads: 9, est: 7, closed: 1 },
+    { zip: '85253', div: 'Roof', leads: 7, est: 5, closed: 1 },
+    { zip: '85260', div: 'Roof', leads: 6, est: 4, closed: 0 },
+    { zip: '85048', div: 'Roof', leads: 5, est: 4, closed: 0 },
+    { zip: '85298', div: 'Roof + EV', leads: 14, est: 10, closed: 2 },
+    { zip: '85255', div: 'EV', leads: 16, est: 11, closed: 3 },
+    { zip: '85249', div: 'EV', leads: 10, est: 7, closed: 2 },
+    { zip: '85050', div: 'EV', leads: 8, est: 5, closed: 1 },
+    { zip: '85142', div: 'EV', leads: 6, est: 4, closed: 1 }
   ];
 
-  const TOT = CHANNELS.reduce((a, c) => ({
-    spend: a.spend + c.spend, leads: a.leads + c.leads,
-    booked: a.booked + c.booked, revenue: a.revenue + c.revenue
-  }), { spend: 0, leads: 0, booked: 0, revenue: 0 });
+  /* ── closers (owners do the follow-up today) ─────────────── */
+  const CLOSERS = [
+    { name: 'Micah', leads: 58, response: '3 min', rate: 0.17, revenue: 61200 },
+    { name: 'Justin', leads: 52, response: '6 min', rate: 0.15, revenue: 59421 }
+  ];
 
+  /* ── reputation ──────────────────────────────────────────── */
+  const REVIEWS = { month: 6, lastMonth: 4, total: 25, rating: 5.0 };
+
+  /* ── projects ────────────────────────────────────────────── */
   const STAGE_LABEL = {
+    estimate: 'Estimate scheduled', approved: 'Approved',
     inspection: 'Inspection scheduled', contract: 'Contract signed',
     solar_detach: 'Solar detach', roof_replace: 'Roof replacement',
-    solar_reset: 'Solar reset', walkthrough: 'Final walkthrough', complete: 'Complete'
+    solar_reset: 'Solar reset', walkthrough: 'Final walkthrough',
+    complete: 'Complete'
   };
-  const STAGE_ORDER = ['inspection', 'contract', 'solar_detach', 'roof_replace', 'solar_reset', 'walkthrough', 'complete'];
-  const STAGE_SHORT = { inspection: 'Inspection', contract: 'Contract', solar_detach: 'Solar detach', roof_replace: 'Roof replace', solar_reset: 'Solar reset', walkthrough: 'Walkthrough', complete: 'Complete' };
+  const STAGE_ORDER = ['estimate', 'approved', 'inspection', 'contract', 'solar_detach', 'roof_replace', 'solar_reset', 'walkthrough', 'complete'];
+  const STAGE_SHORT = { estimate: 'Estimate', approved: 'Approved', inspection: 'Inspection', contract: 'Contract', solar_detach: 'Solar detach', roof_replace: 'Roof replace', solar_reset: 'Solar reset', walkthrough: 'Walkthrough', complete: 'Complete' };
 
   /* ───────── KPI ───────── */
-  function sparkline(vals, color) {
-    const w = 62, h = 26, max = Math.max(...vals), min = Math.min(...vals);
-    const pts = vals.map((v, i) => {
-      const x = (i / (vals.length - 1)) * w;
-      const y = h - ((v - min) / (max - min || 1)) * (h - 4) - 2;
-      return x.toFixed(1) + ',' + y.toFixed(1);
-    }).join(' ');
-    return '<svg class="kpi__spark" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' +
-      '<polyline fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" points="' + pts + '"/></svg>';
+  function kpi(label, value, sub, tone) {
+    return '<div class="kpi"><div class="kpi__l">' + label + '</div>' +
+      '<div class="kpi__v">' + value + '</div>' +
+      '<div class="kpi__d' + (tone ? ' ' + tone : '') + '">' + sub + '</div></div>';
   }
 
   function renderKpis() {
     const leads = store.leads();
-    const jobs = store.jobs();
-    const openJobs = jobs.filter(j => j.stage !== 'complete').length;
-    const quoted = leads.filter(l => l.status === 'Quoted').length;
-    const cpl = TOT.spend / TOT.leads;
-    const cpa = TOT.spend / TOT.booked;
-    const roas = TOT.revenue / TOT.spend;
+    const contacted = 104;
+    const needsFollowUp = leads.filter(l => l.status === 'New' || l.status === 'Needs follow-up').length + 4;
+    const showRate = Math.round(TOT.shows / TOT.est * 100);
+    $('#kpis').innerHTML = [
+      kpi('Leads contacted', contacted + '<span class="kpi__of">/' + TOT.leads + '</span>', '94% of new leads worked'),
+      kpi('Needs follow-up', needsFollowUp, 'Oldest waiting 6h', needsFollowUp > 5 ? 'warn' : ''),
+      kpi('Estimates closed', TOT.closed, Math.round(TOT.closed / TOT.leads * 100) + '% lead to close'),
+      kpi('Revenue booked', fmt$(TOT.revenue), 'Roof + EV + solar'),
+      kpi('Ad spend', fmt$(TOT.spend), '30 days, all channels'),
+      kpi('Cost per estimate', fmt$(TOT.spend / TOT.est), TOT.est + ' estimates run'),
+      kpi('Show rate', showRate + '%', TOT.shows + ' of ' + TOT.est + ' showed'),
+      kpi('Speed to lead', CLOSERS[0].response, 'Median first response')
+    ].join('');
+  }
 
-    const cards = [
-      { l: 'Ad spend', v: fmt$(TOT.spend), s: 'LSA + Google + Meta', spark: [300, 420, 380, 500, 460, 540, 610], c: '#2E90FA' },
-      { l: 'Revenue booked', v: fmt$(TOT.revenue), s: '<span class="up">▲ 8.3x</span> return on spend', spark: [8, 12, 10, 18, 22, 27, 37], c: '#12B76A' },
-      { l: 'Leads', v: TOT.leads, s: openJobs + ' active projects', spark: [3, 5, 4, 6, 5, 7, 8], c: '#7A5AF8' },
-      { l: 'Jobs booked', v: TOT.booked, s: Math.round(TOT.booked / TOT.leads * 100) + '% of leads', spark: [1, 1, 2, 2, 3, 4, 4], c: '#00A87E' },
-      { l: 'Cost per lead', v: fmt$(cpl), s: 'blended across channels', spark: [210, 195, 200, 180, 176, 174, 173], c: '#F79009' },
-      { l: 'Cost per acquisition', v: fmt$(cpa), s: 'per booked job', spark: [980, 940, 900, 860, 820, 780, 750], c: '#F04438' },
-      { l: 'ROAS', v: roas.toFixed(1) + 'x', s: 'booked ÷ ad spend', spark: [4, 5, 6, 7, 7.5, 8, 8.3], c: '#00D6A1' },
-      { l: 'Quotes out', v: quoted, s: 'awaiting decision', spark: [2, 3, 3, 4, 4, 4, 4], c: '#5925DC' }
-    ];
+  /* ───────── follow-up queue ───────── */
+  function renderFollowUp() {
+    const leads = store.leads()
+      .filter(l => l.status === 'New' || l.status === 'Needs follow-up')
+      .slice(0, 5);
+    if (!leads.length) {
+      $('#followupList').innerHTML = '<div class="empty">Nothing waiting. Every lead has been contacted.</div>';
+      return;
+    }
+    $('#followupList').innerHTML = leads.map(l => {
+      const wait = l.status === 'Needs follow-up' ? '6h' : '<1h';
+      return '<div class="frow" data-lead="' + l.id + '">' +
+        '<div class="av">' + (l.name || '?').slice(0, 1).toUpperCase() + '</div>' +
+        '<div class="frow__n"><b>' + (l.name || 'Unknown') + '</b>' +
+        '<span>' + (l.need || 'General') + (l.zip ? ' · ' + l.zip : '') + '</span></div>' +
+        '<div class="frow__t"><span class="pill ' + (wait === '6h' ? 'pill--warn' : 'pill--ok') + '">' + wait + '</span></div></div>';
+    }).join('');
+    document.querySelectorAll('[data-lead]').forEach(n => n.addEventListener('click', () => openLead(n.dataset.lead)));
+  }
 
-    $('#overview').innerHTML = cards.map(c =>
-      '<div class="kpi">' + sparkline(c.spark, c.c) +
-      '<div class="kpi__l">' + c.l + '</div>' +
-      '<div class="kpi__v">' + c.v + '</div>' +
-      '<div class="kpi__s">' + c.s + '</div></div>'
-    ).join('');
+  /* ───────── divisions ───────── */
+  function renderSplit() {
+    $('#split').innerHTML = DIVISIONS.map(d => {
+      const pct = Math.round(d.value / DIV_TOTAL * 100);
+      return '<div class="spl"><div class="spl__t">' + d.name + '</div>' +
+        '<div class="spl__v">' + fmt$(d.value) + '</div>' +
+        '<div class="spl__m">' + d.jobs + ' jobs · avg ' + fmt$(d.avg) + '</div>' +
+        '<div class="spl__bar"><i style="width:' + pct + '%;background:' + d.color + '"></i></div></div>';
+    }).join('');
   }
 
   /* ───────── channels ───────── */
   function renderChannels() {
-    const rows = CHANNELS.map(c => {
-      const cpl = c.spend / c.leads, cpa = c.spend / c.booked;
-      return '<tr>' +
-        '<td><span class="chan"><i class="dotc" style="background:' + c.color + '"></i><span>' + c.name +
-        '<span class="src">' + (c.short === 'LSA' ? 'Google Guaranteed' : c.short === 'Google' ? 'Search + PMax' : 'Reels + feed') + '</span></span></span></td>' +
-        '<td>' + fmt$(c.spend) + '</td><td>' + c.leads + '</td><td>' + fmt$(cpl) + '</td>' +
-        '<td>' + c.booked + '</td><td>' + fmt$(cpa) + '</td><td><b>' + fmt$(c.revenue) + '</b></td></tr>';
+    const tb = $('#chanTable tbody');
+    tb.innerHTML = CHANNELS.map(c => {
+      return '<tr><td><span class="chan"><i style="background:' + c.color + '"></i>' + c.name + '</span></td>' +
+        '<td>' + fmt$(c.spend) + '</td><td>' + c.leads + '</td><td>' + c.est + '</td>' +
+        '<td>' + c.shows + '</td><td>' + c.closed + '</td>' +
+        '<td>' + fmt$(c.spend / c.est) + '</td><td>' + fmt$(c.revenue) + '</td></tr>';
+    }).join('') +
+      '<tr class="tot"><td>Total</td><td>' + fmt$(TOT.spend) + '</td><td>' + TOT.leads + '</td><td>' + TOT.est + '</td>' +
+      '<td>' + TOT.shows + '</td><td>' + TOT.closed + '</td><td>' + fmt$(TOT.spend / TOT.est) + '</td><td>' + fmt$(TOT.revenue) + '</td></tr>';
+  }
+
+  /* ───────── ZIP heat ───────── */
+  function renderZips() {
+    const max = Math.max(...ZIPS.map(z => z.leads));
+    $('#zipgrid').innerHTML = ZIPS.map(z => {
+      const t = z.leads / max;
+      const col = t > 0.75 ? '#1857C5' : t > 0.5 ? '#3A84F6' : t > 0.3 ? '#6BA2F9' : '#0D2D6E';
+      return '<div class="zt" style="background:' + col + '"><em>' + z.div + '</em>' +
+        '<b>' + z.zip + '</b><span>' + z.leads + ' leads · ' + z.est + ' est · ' + z.closed + ' closed</span></div>';
     }).join('');
-    $('#chanTable tbody').innerHTML = rows;
-    $('#chanTable tfoot').innerHTML = '<tr>' +
-      '<td>Total</td><td>' + fmt$(TOT.spend) + '</td><td>' + TOT.leads + '</td>' +
-      '<td>' + fmt$(TOT.spend / TOT.leads) + '</td><td>' + TOT.booked + '</td>' +
-      '<td>' + fmt$(TOT.spend / TOT.booked) + '</td><td>' + fmt$(TOT.revenue) + '</td></tr>';
+  }
+
+  /* ───────── closers ───────── */
+  function renderClosers() {
+    $('#closerRows').innerHTML = CLOSERS.map(c => {
+      const rate = Math.round(c.rate * 100);
+      const tone = c.rate >= 0.16 ? 'pill--ok' : 'pill--warn';
+      return '<div class="closer"><div class="closer__n"><span class="av">' + c.name[0] + '</span>' + c.name + '</div>' +
+        '<div>' + c.leads + '</div><div>' + c.response + '</div>' +
+        '<div><span class="pill ' + tone + '">' + rate + '%</span></div>' +
+        '<div>' + fmt$(c.revenue) + '</div></div>';
+    }).join('');
+  }
+
+  /* ───────── reviews ───────── */
+  function renderReviews() {
+    const pct = Math.round((REVIEWS.month / 8) * 100);
+    $('#reviewBox').innerHTML =
+      '<div class="spl__v">+' + REVIEWS.month + ' <span style="font-size:13px;font-weight:600;color:#5A6B8C">new reviews</span></div>' +
+      '<div class="spl__m" style="margin-bottom:10px">' + REVIEWS.lastMonth + ' last month · ' + REVIEWS.total + ' total · ' + REVIEWS.rating.toFixed(1) + ' average</div>' +
+      '<div class="spl__bar"><i style="width:' + pct + '%;background:#F5B73B"></i></div>' +
+      '<div class="spl__m" style="margin-top:10px">Target is one review per completed job. Every job gets the ask at the final walkthrough.</div>';
   }
 
   /* ───────── funnel ───────── */
   function renderFunnel() {
-    const leads = store.leads();
-    const scheduled = leads.filter(l => ['Scheduled', 'Quoted', 'Won'].includes(l.status)).length;
-    const booked = leads.filter(l => l.status === 'Won').length;
     const rows = [
-      ['Visitors', 1840, 100],
-      ['Leads', TOT.leads, Math.round(TOT.leads / 1840 * 1000) / 10],
-      ['Quotes / walkthroughs', scheduled, Math.round(scheduled / TOT.leads * 100)],
-      ['Booked jobs', booked, Math.round(booked / TOT.leads * 100)]
+      ['New leads', TOT.leads, 100],
+      ['Contacted', 104, 95],
+      ['Estimate set', TOT.est, 64],
+      ['Estimate ran', TOT.shows, 47],
+      ['Closed', TOT.closed, 16]
     ];
-    const max = 1840;
-    $('#funnelBody').innerHTML = rows.map((r, i) => {
-      const pct = Math.max(8, Math.round(r[1] / max * 100));
-      return '<div class="fn"><div class="fn__l">' + r[0] + '</div>' +
-        '<div class="fn__bar" style="width:' + pct + '%;background:' +
-        ['linear-gradient(90deg,#0A1628,#24446B)', 'linear-gradient(90deg,#12395F,#2E90FA)', 'linear-gradient(90deg,#135C4B,#00C495)', 'linear-gradient(90deg,#046B52,#12B76A)'][i] + '">' +
-        '<span>' + r[1] + '</span></div>' +
-        '<div class="fn__p">' + (i === 0 ? '—' : r[2] + '%') + '</div></div>';
-    }).join('');
-    $('#funnelNote').innerHTML = 'Lead to booked conversion is <b>' + Math.round(booked / TOT.leads * 100) + '%</b>. Industry average for roofing sits near 15%.';
-  }
-
-  /* ───────── revenue chart ───────── */
-  function renderRevenue() {
-    const leads = store.leads();
-    const won = leads.filter(l => l.status === 'Won');
-    const W = 420, H = 150, pad = 26;
-    let cum = 0;
-    const pts = [];
-    const days = 30;
-    for (let d = days; d >= 0; d--) {
-      const dayStart = new Date(); dayStart.setDate(dayStart.getDate() - d);
-      const val = won.filter(l => {
-        const dt = new Date(l.createdAt);
-        return dt.toDateString() === dayStart.toDateString();
-      }).reduce((a, x) => a + (x.value || 0), 0);
-      cum += val;
-      pts.push(cum);
-    }
-    const maxV = Math.max(...pts, TOT.revenue);
-    const coords = pts.map((v, i) => {
-      const x = pad + (i / (pts.length - 1)) * (W - pad * 2);
-      const y = H - 24 - (v / maxV) * (H - 40);
-      return [x, y];
-    });
-    const line = coords.map(c => c[0].toFixed(1) + ',' + c[1].toFixed(1)).join(' ');
-    const area = line + ' ' + (W - pad) + ',' + (H - 24) + ' ' + pad + ',' + (H - 24);
-    const grid = [0, 1, 2, 3].map(i => {
-      const y = 20 + i * ((H - 44) / 3);
-      return '<line x1="' + pad + '" y1="' + y + '" x2="' + (W - pad) + '" y2="' + y + '" stroke="#EEF3F8" stroke-width="1"/>';
-    }).join('');
-
-    $('#revChart').innerHTML =
-      '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="170">' +
-      grid +
-      '<defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1">' +
-      '<stop offset="0%" stop-color="#00D6A1" stop-opacity=".28"/>' +
-      '<stop offset="100%" stop-color="#00D6A1" stop-opacity="0"/></linearGradient></defs>' +
-      '<polygon points="' + area + '" fill="url(#rg)"/>' +
-      '<polyline points="' + line + '" fill="none" stroke="#00A87E" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>' +
-      '<circle cx="' + coords[coords.length - 1][0].toFixed(1) + '" cy="' + coords[coords.length - 1][1].toFixed(1) + '" r="4" fill="#00A87E" stroke="#fff" stroke-width="2"/>' +
-      '<text x="' + pad + '" y="' + (H - 8) + '" font-size="9" fill="#8798AC">30 days ago</text>' +
-      '<text x="' + (W - pad) + '" y="' + (H - 8) + '" font-size="9" fill="#8798AC" text-anchor="end">today</text>' +
-      '<text x="' + pad + '" y="14" font-size="10" font-weight="800" fill="#0A1628">' + fmt$(cum) + '</text>' +
-      '</svg>';
+    $('#funnel').innerHTML = rows.map(([label, val, pct]) =>
+      '<div class="fn"><div class="fn__l">' + label + '</div>' +
+      '<div class="fn__b"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="fn__v">' + val + '</div></div>').join('');
   }
 
   /* ───────── projects board ───────── */
   function renderBoard() {
     const jobs = store.jobs();
-    const cols = ['inspection', 'contract', 'solar_detach', 'roof_replace', 'solar_reset', 'walkthrough', 'complete'];
-    $('#board').innerHTML = cols.map(stage => {
+    const board = $('#board');
+    board.innerHTML = STAGE_ORDER.map(stage => {
       const items = jobs.filter(j => j.stage === stage);
-      return '<div class="col"><div class="col__h">' + STAGE_SHORT[stage] + '<b>' + items.length + '</b></div>' +
+      if (!items.length && !['estimate', 'contract', 'roof_replace', 'complete'].includes(stage)) return '';
+      return '<div class="col"><div class="col__h">' + STAGE_SHORT[stage] +
+        '<span>' + items.length + '</span></div>' +
         items.map(j => '<div class="jobcard" data-job="' + j.id + '">' +
-          '<div class="jobcard__t">' + j.client + '</div>' +
-          '<div class="jobcard__m"><span>' + j.id + ' · ' + j.address + '</span></div>' +
-          '<div class="jobcard__m"><span class="mut">' + j.channel + '</span><span class="jobcard__v">' + fmt$(j.value) + '</span></div>' +
+          '<div class="jobcard__n">' + (j.customer || j.client || 'Job') + '</div>' +
+          '<div class="jobcard__m">' + (j.city || j.address || '') + ' ' + (j.zip || '') + '</div>' +
+          '<div class="jobcard__v">' + fmt$(j.value || 0) + '</div>' +
+          '<div class="jobcard__c"><i style="background:' + (j.color || '#3A84F6') + '"></i>' + (j.channel || 'Direct') + '</div>' +
           '</div>').join('') + '</div>';
     }).join('');
-    $('#jobsCount').textContent = jobs.filter(j => j.stage !== 'complete').length + ' active · ' +
-      jobs.filter(j => j.stage === 'complete').length + ' complete';
     document.querySelectorAll('[data-job]').forEach(n => n.addEventListener('click', () => openJob(n.dataset.job)));
   }
 
   /* ───────── leads ───────── */
   function renderLeads() {
-    const leads = store.leads();
-    const order = { New: 0, Quoted: 1, Scheduled: 2, Won: 3, Lost: 4 };
-    const sorted = leads.slice().sort((a, b) => {
-      const s = (order[a.status] ?? 5) - (order[b.status] ?? 5);
-      return s !== 0 ? s : new Date(b.createdAt) - new Date(a.createdAt);
-    });
-    $('#leadCount').textContent = leads.length + ' total';
-    $('#leadList').innerHTML = sorted.map(l => {
-      const initials = (l.name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-      const cls = (l.status || 'New').toLowerCase();
-      const age = Math.round((Date.now() - new Date(l.createdAt)) / 86400000);
+    const leads = store.leads().slice(0, 14);
+    $('#leadList').innerHTML = leads.map(l => {
+      const initials = (l.name || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      const sc = l.score || 0;
+      const tone = sc >= 80 ? 'pill--ok' : sc >= 60 ? 'pill--warn' : 'pill--bad';
       return '<div class="leadrow" data-lead="' + l.id + '">' +
         '<div class="leadrow__n"><span class="av">' + initials + '</span><span>' + (l.name || 'Unknown') +
-        '<span class="src">' + (l.zip || '') + ' · ' + (age <= 0 ? 'today' : age + 'd ago') + '</span></span></div>' +
-        '<div class="mut">' + (l.channel || l.source || '—') + '</div>' +
-        '<div class="mut" style="font-size:12px">' + (l.need || '—') + '</div>' +
-        '<div><span class="score">' + (l.score || 50) + '<span class="score__b"><i style="width:' + (l.score || 50) + '%"></i></span></span></div>' +
-        '<div style="text-align:right"><span class="tag tag--' + cls + '">' + (l.status || 'New') + '</span></div>' +
-        '</div>';
+        '<em>' + (l.channel || 'Website') + '</em></span></div>' +
+        '<div>' + (l.need || '—') + '</div>' +
+        '<div>' + (l.zip || '—') + '</div>' +
+        '<div><span class="pill ' + tone + '">' + sc + '</span></div>' +
+        '<div>' + (l.status || 'New') + '</div></div>';
     }).join('');
     document.querySelectorAll('[data-lead]').forEach(n => n.addEventListener('click', () => openLead(n.dataset.lead)));
   }
@@ -197,99 +216,57 @@
   /* ───────── drawer ───────── */
   const drawer = $('#drawer'), scrim = $('#scrim');
   function closeDrawer() { drawer.classList.remove('on'); scrim.classList.remove('on'); }
-  $('#drawerX').addEventListener('click', closeDrawer);
+  $('#drawer').addEventListener('click', e => { if (e.target.id === 'drawerX') closeDrawer(); });
   scrim.addEventListener('click', closeDrawer);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 
   function openLead(id) {
-    const l = store.leads().find(x => x.id === id); if (!l) return;
-    $('#dTitle').textContent = l.name || 'Lead';
-    $('#dSub').textContent = (l.channel || l.source || '') + ' · ' + new Date(l.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · score ' + (l.score || 50);
-    const status = l.status || 'New';
-    const steps = [
-      ['Lead captured', true, ''],
-      ['Contacted', ['Quoted', 'Scheduled', 'Won'].includes(status), ''],
-      ['Quote sent', ['Quoted', 'Scheduled', 'Won'].includes(status), ''],
-      ['Walkthrough booked', ['Scheduled', 'Won'].includes(status), l.slot || ''],
-      ['Job won', status === 'Won', l.value ? fmt$(l.value) : 'pending']
-    ];
-    $('#dBody').innerHTML =
-      '<div class="dl">' +
-      '<div class="dl__i"><div class="dl__l">Need</div><div class="dl__v">' + (l.need || '—') + '</div></div>' +
-      '<div class="dl__i"><div class="dl__l">Service line</div><div class="dl__v">' + (l.service || '—') + '</div></div>' +
-      '<div class="dl__i"><div class="dl__l">Phone</div><div class="dl__v">' + (l.phone || '—') + '</div></div>' +
-      '<div class="dl__i"><div class="dl__l">ZIP</div><div class="dl__v">' + (l.zip || '—') + '</div></div>' +
-      '<div class="dl__i"><div class="dl__l">Solar on roof</div><div class="dl__v">' + (l.hasSolar ? 'Yes' : 'No') + '</div></div>' +
-      '<div class="dl__i"><div class="dl__l">Timeline</div><div class="dl__v">' + (l.timeline || '—') + '</div></div>' +
-      '<div class="dl__i"><div class="dl__l">Est. value</div><div class="dl__v">' + (l.value ? fmt$(l.value) : 'TBD') + '</div></div>' +
-      '<div class="dl__i"><div class="dl__l">Status</div><div class="dl__v"><span class="tag tag--' + status.toLowerCase() + '">' + status + '</span></div></div>' +
-      '</div>' +
-      '<h4 style="margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6B7C93">Lead journey</h4>' +
-      '<div class="timeline">' + steps.map((s, i) =>
-        '<div class="tl ' + (s[1] ? 'done' : '') + '"><div class="tl__t">' + s[0] + (s[2] ? '<span>' + s[2] + '</span>' : '') + '</div>' +
-        '<div class="tl__d">' + (s[1] ? 'Completed' : 'Pending') + '</div></div>').join('') + '</div>';
-    $('#dCall').href = 'tel:' + (l.phone || '').replace(/[^\d+]/g, '');
-    $('#dText').href = 'sms:' + (l.phone || '').replace(/[^\d+]/g, '');
+    const l = store.leads().find(x => x.id === id);
+    if (!l) return;
+    drawer.innerHTML = '<div class="drawer__h"><div><b>' + (l.name || 'Lead') + '</b>' +
+      '<span>' + (l.need || 'General') + '</span></div><button id="drawerX" class="drawer__x">×</button></div>' +
+      '<div class="drawer__b">' +
+      row('Phone', l.phone || '—') + row('Email', l.email || '—') +
+      row('Property', l.address || '—') + row('ZIP', l.zip || '—') +
+      row('Timeline', l.timeline || '—') + row('Channel', l.channel || '—') +
+      row('Score', (l.score || 0) + ' / 97') + row('Status', l.status || 'New') +
+      (l.slot ? row('Estimate', l.slot) : '') +
+      '</div>';
     drawer.classList.add('on'); scrim.classList.add('on');
   }
 
   function openJob(id) {
-    const j = store.jobs().find(x => x.id === id); if (!j) return;
+    const j = store.jobs().find(x => x.id === id);
+    if (!j) return;
     const idx = STAGE_ORDER.indexOf(j.stage);
-    $('#dTitle').textContent = j.client + ' · ' + j.id;
-    $('#dSub').textContent = j.address + ' · ' + j.channel + ' · ' + fmt$(j.value) + ' contract';
-    $('#dBody').innerHTML =
-      '<div class="dl">' +
-      '<div class="dl__i"><div class="dl__l">Stage</div><div class="dl__v">' + STAGE_LABEL[j.stage] + '</div></div>' +
-      '<div class="dl__i"><div class="dl__l">Crew lead</div><div class="dl__v">' + j.owner + '</div></div>' +
-      '<div class="dl__i"><div class="dl__l">Contract value</div><div class="dl__v">' + fmt$(j.value) + '</div></div>' +
-      '<div class="dl__i"><div class="dl__l">Source</div><div class="dl__v">' + j.channel + '</div></div>' +
-      '</div>' +
-      '<h4 style="margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6B7C93">Job status</h4>' +
-      '<div class="timeline">' +
-      STAGE_ORDER.map((s, i) => {
-        const state = i < idx ? 'done' : i === idx ? 'now' : '';
-        const when = i < idx ? 'Complete' : i === idx ? 'In progress' : 'Pending';
-        return '<div class="tl ' + state + '"><div class="tl__t">' + STAGE_LABEL[s] +
-          (i === idx ? '<span>now</span>' : '') + '</div><div class="tl__d">' + when + '</div></div>';
-      }).join('') + '</div>';
-    $('#dCall').href = 'tel:+16024818050';
-    $('#dText').href = 'sms:+16024818050';
+    const timeline = STAGE_ORDER.slice(0, Math.max(idx + 1, 1)).map((s, i) =>
+      '<li class="' + (i === idx ? 'now' : 'done') + '"><span></span>' + STAGE_LABEL[s] + '</li>').join('');
+    drawer.innerHTML = '<div class="drawer__h"><div><b>' + (j.customer || j.client || 'Job') + '</b>' +
+      '<span>' + (j.city || j.address || '') + ' ' + (j.zip || '') + ' · ' + (j.channel || 'Direct') + '</span></div>' +
+      '<button id="drawerX" class="drawer__x">×</button></div>' +
+      '<div class="drawer__b">' +
+      row('Contract value', fmt$(j.value || 0)) +
+      row('Stage', STAGE_LABEL[j.stage] || j.stage) +
+      row('Crew lead', j.crew || j.owner || '—') +
+      '<div class="drawer__sec">Status timeline</div><ul class="tl">' + timeline + '</ul>' +
+      '</div>';
     drawer.classList.add('on'); scrim.classList.add('on');
   }
 
-  /* ───────── init ───────── */
+  function row(k, v) {
+    return '<div class="drow"><span>' + k + '</span><b>' + v + '</b></div>';
+  }
+
+  /* ───────── boot ───────── */
   function renderAll() {
-    renderKpis(); renderChannels(); renderFunnel(); renderBoard(); renderLeads(); renderRevenue();
+    renderKpis(); renderFollowUp(); renderSplit(); renderChannels();
+    renderZips(); renderClosers(); renderReviews(); renderFunnel();
+    renderBoard(); renderLeads();
   }
   renderAll();
 
-  $('#clock').textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-  $('#resetBtn').addEventListener('click', () => {
-    store.reset(); renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-
-  // live updates when a chat lead lands in the store
-  window.addEventListener('vg:lead', e => {
-    renderAll();
-    const row = document.querySelector('[data-lead="' + e.detail.id + '"]');
-    if (row) { row.classList.add('new'); row.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-  });
-
-  // cross-tab sync (site open in another tab)
-  window.addEventListener('storage', ev => {
-    if (ev.key && ev.key.indexOf('vg_demo_leads') === 0) renderAll();
-  });
-
-  // sidebar smooth scroll
-  document.querySelectorAll('.side a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      e.preventDefault();
-      const t = document.querySelector(a.getAttribute('href'));
-      if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      document.querySelectorAll('.side a').forEach(x => x.classList.remove('on'));
-      a.classList.add('on');
-    });
-  });
+  window.addEventListener('vg:lead', renderAll);
+  window.addEventListener('storage', e => { if (e.key && e.key.indexOf('vg_demo_leads') === 0) renderAll(); });
+  const reset = $('#resetBtn');
+  if (reset) reset.addEventListener('click', () => { store.reset(); renderAll(); });
 })();

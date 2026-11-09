@@ -17,7 +17,8 @@
 
   /* ── seed once ───────────────────────────────────────────── */
   function seed() {
-    if (read(LS.seeded, false)) return;
+    const existingLeads = read(LS.leads, []);
+    const existingJobs = read(LS.jobs, []);
     const leads = [
       { name: 'Olga A.', phone: '(602) 555-0142', zip: '85032', need: 'Roof + Solar Detach/Reset', service: 'Roofing', hasSolar: true, timeline: 'ASAP', source: 'LSA', channel: 'LSA', status: 'Won', value: 14800, createdAt: daysAgo(21) },
       { name: 'Julie A.', phone: '(480) 555-0198', zip: '85254', need: 'Roof Repair', service: 'Roofing', hasSolar: false, timeline: 'ASAP', source: 'Google Ads', channel: 'Google Ads', status: 'Won', value: 3200, createdAt: daysAgo(19) },
@@ -37,17 +38,21 @@
     ].map(l => Object.assign({ id: uid('L'), score: scoreOf(l) }, l));
 
     const jobs = [
-      { id: 'J-1041', client: 'Olga A.', address: 'Phoenix 85032', value: 14800, channel: 'LSA', stage: 'walkthrough', owner: 'Micah', start: daysAgo(18) },
-      { id: 'J-1042', client: 'Len T.', address: 'Phoenix 85050', value: 16200, channel: 'LSA', stage: 'solar_reset', owner: 'Justin', start: daysAgo(14) },
-      { id: 'J-1043', client: 'Andrew M.', address: 'Phoenix 85085', value: 11400, channel: 'Meta', stage: 'roof_replace', owner: 'Micah', start: daysAgo(11) },
-      { id: 'J-1044', client: 'Brian M.', address: 'Phoenix 85032', value: 13900, channel: 'LSA', stage: 'solar_detach', owner: 'Justin', start: daysAgo(6) },
-      { id: 'J-1045', client: 'Colten G.', address: 'Scottsdale 85260', value: 15100, channel: 'LSA', stage: 'contract', owner: 'Micah', start: daysAgo(4) },
-      { id: 'J-1046', client: 'Michelle F.', address: 'Scottsdale 85254', value: 11700, channel: 'Google Ads', stage: 'inspection', owner: 'Justin', start: daysAgo(2) },
-      { id: 'J-1047', client: 'Julie A.', address: 'Scottsdale 85254', value: 3200, channel: 'Google Ads', stage: 'complete', owner: 'Micah', start: daysAgo(19) },
-      { id: 'J-1048', client: 'Marc D.', address: 'Scottsdale 85260', value: 2100, channel: 'Google Ads', stage: 'complete', owner: 'Justin', start: daysAgo(12) }
+      { id: 'J-1041', customer: 'Olga A.', address: 'Phoenix', zip: '85032', value: 24100, channel: 'LSA', color: '#3A84F6', stage: 'walkthrough', crew: 'Micah', start: daysAgo(18) },
+      { id: 'J-1042', customer: 'Len T.', address: 'Paradise Valley', zip: '85253', value: 26800, channel: 'LSA', color: '#3A84F6', stage: 'solar_reset', crew: 'Justin', start: daysAgo(14) },
+      { id: 'J-1043', customer: 'Andrew M.', address: 'Scottsdale', zip: '85255', value: 817, channel: 'Meta', color: '#F5B73B', stage: 'approved', crew: 'Micah', start: daysAgo(11) },
+      { id: 'J-1044', customer: 'Brian M.', address: 'Phoenix', zip: '85032', value: 23400, channel: 'LSA', color: '#3A84F6', stage: 'solar_detach', crew: 'Justin', start: daysAgo(6) },
+      { id: 'J-1045', customer: 'Colten G.', address: 'Scottsdale', zip: '85260', value: 25200, channel: 'LSA', color: '#3A84F6', stage: 'contract', crew: 'Micah', start: daysAgo(4) },
+      { id: 'J-1046', customer: 'Michelle F.', address: 'Scottsdale', zip: '85254', value: 22900, channel: 'Google Ads', color: '#F5B73B', stage: 'inspection', crew: 'Justin', start: daysAgo(2) },
+      { id: 'J-1047', customer: 'Julie A.', address: 'Scottsdale', zip: '85254', value: 817, channel: 'Google Ads', color: '#F5B73B', stage: 'complete', crew: 'Micah', start: daysAgo(19) },
+      { id: 'J-1048', customer: 'Marc D.', address: 'Scottsdale', zip: '85260', value: 817, channel: 'Google Ads', color: '#F5B73B', stage: 'complete', crew: 'Justin', start: daysAgo(12) },
+      { id: 'J-1049', customer: 'Dylan C.', address: 'Scottsdale', zip: '85255', value: 817, channel: 'Meta', color: '#F5B73B', stage: 'estimate', crew: 'Micah', start: daysAgo(1) },
+      { id: 'J-1050', customer: 'Doug B.', address: 'Fountain Hills', zip: '85268', value: 24600, channel: 'LSA', color: '#3A84F6', stage: 'estimate', crew: 'Justin', start: daysAgo(1) }
     ];
-    write(LS.leads, leads);
-    write(LS.jobs, jobs);
+    const haveLeads = new Set(existingLeads.map(l => (l.name || '').toLowerCase()));
+    const haveJobs = new Set(existingJobs.map(j => j.id));
+    write(LS.leads, existingLeads.concat(leads.filter(l => !haveLeads.has((l.name || '').toLowerCase()))));
+    write(LS.jobs, existingJobs.concat(jobs.filter(j => !haveJobs.has(j.id))));
     write(LS.seeded, true);
   }
 
@@ -189,7 +194,7 @@
   ];
 
   function offerSlots() {
-    const m = el('div', 'msg msg--bot', 'Here are the next openings for a free walkthrough. Which works?');
+    const m = el('div', 'msg msg--bot', 'Here are the next openings. Pick one and an owner confirms it by text.');
     body.appendChild(m);
     const grid = el('div', 'chat__slots');
     SLOTS.forEach(s => {
@@ -323,8 +328,18 @@
 
     if (step === 'phone') {
       lead.phone = text.trim().slice(0, 24);
-      botSay('Got it. Booking you in…', null, 500);
-      return setTimeout(offerSlots, 900);
+      return askAddress();
+    }
+
+    if (step === 'address') {
+      lead.address = text.trim().slice(0, 120);
+      return askEmail();
+    }
+
+    if (step === 'email') {
+      lead.email = text.trim().slice(0, 80);
+      botSay('Got it — checking the estimate calendar…', null, 500);
+      return setTimeout(offerSlots, 1100);
     }
 
     if (step === 'slots') return offerSlots();
@@ -367,11 +382,22 @@
     botSay('Perfect — and your name?', null, 520);
   }
 
+  function askAddress() {
+    step = 'address';
+    botSay('What\'s the property address? Micah and Justin pull the roof up on satellite before they come out.', null, 520);
+  }
+
+  function askEmail() {
+    step = 'email';
+    botSay('And an email for the written estimate?', null, 520);
+  }
+
   function startNeed() {
     step = 'need';
     botSay('What can we look at for you?', [
       { label: 'Roof + solar', action: () => needSet('Roof + Solar Detach/Reset', 'Roofing', true) },
       { label: 'Roof only', action: () => { lead.need = 'Roof Replacement'; lead.service = 'Roofing'; askSolar(); } },
+      { label: 'EV charger', action: () => { lead.need = 'EV Charger Install'; lead.service = 'Electrical'; lead.hasSolar = false; askTimeline(); } },
       { label: 'Electrical', action: () => { lead.need = 'Electrical'; lead.service = 'Electrical'; lead.hasSolar = false; askTimeline(); } },
       { label: 'Solar or battery', action: () => { lead.need = 'Solar & Battery'; lead.service = 'Solar'; lead.hasSolar = false; askTimeline(); } }
     ]);
@@ -383,10 +409,10 @@
     const fab = $('#chatFab'); if (fab) fab.style.display = 'none';
     if (!body.dataset.started) {
       body.dataset.started = '1';
-      botSay('Hey — I\'m the Verified Guy AI. I can answer most questions right now, or get you on Micah or Justin\'s schedule in about 60 seconds.', [
+      botSay('Hey — Micah and Justin here, the owners of The Verified Guys. Tell me what you\'re looking at and I\'ll get an estimate on the books, usually within 24 to 48 hours.', [
         { label: 'I need a roof', action: () => needSet('Roof Replacement', 'Roofing', true) },
         { label: 'Solar or battery', action: () => needSet('Solar & Battery', 'Solar', false) },
-        { label: 'Electrical', action: () => needSet('Electrical', 'Electrical', false) },
+        { label: 'EV charger or electrical', action: () => needSet('EV Charger Install', 'Electrical', false) },
         { label: 'Book a walkthrough', action: startNeed }
       ], 300);
     } else if (greet) {
@@ -411,6 +437,10 @@
 
   // proactive engagement, like the brief asked for
   let engaged = false;
+  // pop the conversation after 3s on the page
+  setTimeout(() => {
+    if (!engaged && !chat.classList.contains('open')) openChat();
+  }, 3000);
   setTimeout(() => {
     if (!engaged && !chat.classList.contains('open')) {
       const fab = $('#chatFab');
