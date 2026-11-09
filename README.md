@@ -1,52 +1,29 @@
 # The Verified Guys — Funnel Demo + Client Dashboard
 
-Demo build for The Verified Guys by **LNL Solutions**.
+Built by **LNL Solutions** as a working demo for The Verified Guys.
 
-Two things live here:
+## Live URLs
+- Funnel site: https://lnlsolutions.github.io/verified-guys-demo/
+- Client dashboard: https://lnlsolutions.github.io/verified-guys-demo/crm.html
 
-1. **`index.html`** — a modern, funnel-first rebuild of their public site, using their real copy,
-   photos, reviews, service areas, and ROC numbers. Includes the **Verified Guy AI** chat widget.
-2. **`crm.html`** — the client-facing dashboard showing what their back end looks like from
-   Google Ads, Local Services Ads, and Meta: spend, leads, CPL, CPA, booked revenue, ROAS,
-   projects in production, and clickable job status.
+## What's in it
 
-## The demo trick
+**index.html** — funnel-first rebuild using their real content: dual-licensed roofing + electrical positioning, veteran-owned, solar detach/reset, all seven roof systems, the four services, their six-step process, real Google reviews, both owner bios, their FAQ, phone (602) 481-8050, and partner badges.
 
-The chat widget writes real leads into a shared browser store (`localStorage`), so:
+**Verified Guy AI** — chat popup that qualifies in about 60 seconds: service needed (roofing / solar / electrical) -> solar present -> timeline -> ZIP -> name -> phone -> books one of four walkthrough slots. Saves the lead with a 0-100 score and logs the source. It also answers cost, warranty, timeline, licensing and insurance questions inline.
 
-1. Open the site, walk through the AI chat, book a walkthrough.
-2. Open the dashboard — that lead is sitting in the Leads table, scored, with its booked slot.
-3. Click it to see the lead journey. Click any job card to see where the job sits in production.
+**crm.html** — the client-facing dashboard: $4,500 spend, $37,400 booked, 26 leads, 6 jobs, $173 CPL, $750 CPA, 8.3x ROAS, channel split across LSA / Google / Meta, funnel, revenue trend, lead list, and a project board where every job opens a drawer with stage, contract value, crew lead and timeline.
 
-Both pages read from the same store, so the hand-off is live in front of them.
+Leads captured in the chat appear in the dashboard automatically.
 
-## Demo script (5 minutes)
+## Demo script (4 minutes)
 
-| Step | What to say |
-|---|---|
-| Open the site | "This is your funnel rebuilt — same proof, one job: get the quote." |
-| Scroll to the problem section | "Two-company shuffle versus one team. This is the whole pitch in one graphic." |
-| Ask the AI chat a question | "Watch it answer warranty and pricing, then book a walkthrough on its own." |
-| Book a slot | "That lead just scored 85 and hit the CRM. Nobody typed anything into a form." |
-| Switch to the dashboard | "Here's your side. $4,500 spend, 26 leads, 6 booked, $37,400 revenue, 8.3x." |
-| Click the new lead | "Here it is, with the slot and the source." |
-| Click a job card | "And here's where every job sits in production." |
-
-## Numbers on the dashboard
-
-Fixed campaign totals match the plan: **$4,500** spend across LSA / Google Ads / Meta,
-**26** leads, **6** booked jobs, **$37,400** booked revenue, **$173** CPL, **$750** CPA, **8.3x** ROAS.
-
-**Reset demo data** in the top-right restores the seeded state after a run-through.
-
-## Deploy (GitHub Pages)
-
-Settings → Pages → Source: *Deploy from a branch* → Branch: `main` → Folder: `/ (root)` → Save.
-Live in about a minute at `https://lnlsolutions.github.io/verified-guys-demo/`.
+1. Open the funnel page. Scroll the hero and stop on the quote form.
+2. Open the chat bubble. Say you need a roof. Answer the four questions with a real-sounding Phoenix ZIP, then book a slot.
+3. Show the confirmation with the lead score.
+4. Open crm.html. Point at the KPI row, then show the new lead sitting at the top of the list flagged LIVE.
+5. Click any job card. Walk the timeline: inspection, contract, solar detach, roof replacement, solar reset, walkthrough.
+6. Land on the channel table: this is where the next $1,100 a month goes.
 
 ## Notes
-
-- Static site: no build step, no server, no dependencies.
-- Data lives in the browser only. This is a sales demo, not a production CRM.
-- Next step for a real build: swap `localStorage` for the client's CRM and point the chat at a
-  model endpoint. The UI, flow, and tracking stay the same.
+All data is client-side demo data. No backend, no real submissions. Photos, logo, reviews and copy are theirs.
