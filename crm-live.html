@@ -94,6 +94,22 @@ input[type=date],select{width:100%;border:1px solid var(--line);border-radius:9p
 .toast{position:fixed;left:50%;transform:translate(-50%,20px);bottom:26px;background:var(--navy);color:#fff;padding:11px 16px;border-radius:11px;font-size:12.4px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:0 12px 30px rgba(9,24,54,.3)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 @media(max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.kan{grid-template-columns:repeat(2,1fr)}.rail{display:none}}
+
+  #zips{overflow-x:auto}
+  #ziptbl{width:100%;border-collapse:collapse;min-width:860px}
+  #ziptbl th{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#6E7D99;text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+  #ziptbl td{padding:7px 8px;border-bottom:1px solid #EDF1F9;font-size:12px;vertical-align:middle}
+  #ziptbl td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+  #ziptbl tr.tot td{border-top:2px solid var(--line);background:#F7FAFF;font-weight:700}
+  #ziptbl .bar{height:4px;background:#E7EDF9;border-radius:3px;margin-top:4px;overflow:hidden;min-width:46px}
+  #ziptbl .bar i{display:block;height:100%;background:var(--blue);border-radius:3px}
+  #ziptbl .bar.gold i{background:#E9A93B}
+  .vchip{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.03em;padding:3px 7px;border-radius:99px;white-space:nowrap}
+  .vchip.good{background:#E4F6EC;color:#14713F}
+  .vchip.mid{background:#FFF3DC;color:#8A5B00}
+  .vchip.book{background:#E9EFFC;color:#1B4BA8}
+  .vchip.idle{background:#F1F3F7;color:#7C879C}
+  .vchip.bad{background:#FDE8E8;color:#A3282B}
 </style>
 </head>
 <body>
@@ -102,6 +118,7 @@ input[type=date],select{width:100%;border:1px solid var(--line);border-radius:9p
     <div class="logo"><div class="mark">VG</div><div><b>The Verified Guys</b><span>Client portal</span></div></div>
     <a class="navi on" href="crm-live.html">◎ Pipeline</a>
     <a class="navi" href="#channels">◇ Channels</a>
+    <a class="navi" href="#zips">▦ Spend by ZIP</a>
     <a class="navi" href="lsa.html">◉ LSA mock</a>
     <a class="navi" href="meta.html">◉ Meta mock</a>
     <a class="navi" href="launch.html">▤ Launch plan</a>
@@ -143,6 +160,12 @@ input[type=date],select{width:100%;border:1px solid var(--line);border-radius:9p
             <div id="queue"></div>
           </div>
         </div>
+      </div>
+
+      <div class="card" id="zips" style="margin-top:14px">
+        <h2>Ad spend by ZIP code</h2>
+        <div class="sub">Month to date · spend split across LSA and Meta and matched to the ZIP on each lead. Click any column header to sort.</div>
+        <table id="ziptbl"></table>
       </div>
     </div>
   </main>
@@ -186,6 +209,22 @@ const SEED=[
  {id:8,name:'Derrick Nash',area:'Tempe',ch:'Meta',svc:'Electrical panel + roof',val:8900,stage:'Contacted',fu:inDays(3),notes:[{t:'Left voicemail, texted intro',k:'Text',d:today()}]}
 ];
 const CHAN=[{k:'LSA',spend:1450,proj:true},{k:'Meta',spend:1100,proj:true},{k:'Google',spend:620,proj:false},{k:'Referral',spend:0,proj:false}];
+const ZIPMAP={Ahwatukee:'85048',Gilbert:'85234',Chandler:'85225',Scottsdale:'85251','Queen Creek':'85142',Mesa:'85201',Peoria:'85345',Tempe:'85281','Apache Junction':'85120',Goodyear:'85338',Laveen:'85339','Fountain Hills':'85268'};
+const ZIPS=[
+ {zip:'85251',area:'Scottsdale',lsa:460,meta:180},
+ {zip:'85234',area:'Gilbert',lsa:310,meta:240},
+ {zip:'85225',area:'Chandler',lsa:250,meta:150},
+ {zip:'85048',area:'Ahwatukee',lsa:180,meta:120},
+ {zip:'85201',area:'Mesa',lsa:140,meta:110},
+ {zip:'85142',area:'Queen Creek',lsa:0,meta:180},
+ {zip:'85345',area:'Peoria',lsa:110,meta:60},
+ {zip:'85281',area:'Tempe',lsa:0,meta:60},
+ {zip:'85338',area:'Goodyear',lsa:0,meta:0},
+ {zip:'85339',area:'Laveen',lsa:0,meta:0},
+ {zip:'85120',area:'Apache Junction',lsa:0,meta:0},
+ {zip:'85268',area:'Fountain Hills',lsa:0,meta:0}
+];
+
 
 function today(){return new Date().toISOString().slice(0,10)}
 function tomorrow(){return inDays(1)}
@@ -193,6 +232,7 @@ function inDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOStr
 function load(){try{const s=localStorage.getItem('vg_crm_v2');if(s)return JSON.parse(s)}catch(e){}return JSON.parse(JSON.stringify(SEED))}
 function save(){localStorage.setItem('vg_crm_v2',JSON.stringify(leads))}
 let leads=load(), active=null;
+leads.forEach(l=>{l.zip=l.zip||ZIPMAP[l.area]||'—'});
 
 function money(n){return '$'+n.toLocaleString('en-US')}
 
@@ -247,12 +287,62 @@ function renderQueue(){
   document.getElementById('queue').innerHTML=q.length?q.map(l=>`<div class="lead" onclick="openLead(${l.id})"><b>${l.name}</b><div class="m">${l.area} · ${l.svc}</div><div class="m" style="color:#B45309;font-weight:700">${l.fu<today()?'Overdue':'Due today'}</div></div>`).join(''):'<div class="m" style="font-size:11px;color:#8B9AB5">Clear for today.</div>';
 }
 
-function render(){renderKpis();renderKan();renderChan();renderQueue();save()}
+
+let zsort={k:'spend',dir:-1};
+function zipRows(){
+  const spendByChannel=k=>ZIPS.reduce((s,z)=>s+(z[k==='LSA'?'lsa':'meta']||0),0);
+  const rows=ZIPS.map(z=>{
+    const ls=leads.filter(l=>l.zip===z.zip);
+    const spend=(z.lsa||0)+(z.meta||0);
+    const booked=ls.filter(l=>['Estimate','Won'].includes(l.stage)).length;
+    const won=ls.filter(l=>l.stage==='Won').reduce((s,l)=>s+l.val,0);
+    return {zip:z.zip,area:z.area,lsa:z.lsa||0,meta:z.meta||0,spend,leads:ls.length,
+      cpl:ls.length?spend/ls.length:0,booked,cpb:booked?spend/booked:0,won,roas:spend?won/spend:0};
+  });
+  rows.sort((a,b)=>{const k=zsort.k;const av=a[k],bv=b[k];
+    if(typeof av==='string')return zsort.dir*av.localeCompare(bv);
+    return zsort.dir*(av-bv)});
+  return rows;
+}
+function renderZips(){
+  const rows=zipRows();
+  const tot=rows.reduce((t,r)=>({lsa:t.lsa+r.lsa,meta:t.meta+r.meta,spend:t.spend+r.spend,leads:t.leads+r.leads,
+    booked:t.booked+r.booked,won:t.won+r.won}),{lsa:0,meta:0,spend:0,leads:0,booked:0,won:0});
+  const maxS=Math.max(...rows.map(r=>r.spend),1), maxW=Math.max(...rows.map(r=>r.won),1);
+  const verdict=r=>{
+    if(!r.spend&&!r.leads) return '<span class="vchip idle">No spend</span>';
+    if(!r.spend) return '<span class="vchip book">Organic</span>';
+    if(r.roas>=3) return '<span class="vchip good">Scale</span>';
+    if(r.roas>=1) return '<span class="vchip mid">Watch</span>';
+    if(!r.leads) return '<span class="vchip bad">No leads</span>';
+    return '<span class="vchip mid">Early</span>';
+  };
+  const th=(k,l)=>`<th onclick="zset('${k}')" style="cursor:pointer">${l}${zsort.k===k?(zsort.dir<0?' ↓':' ↑'):''}</th>`;
+  document.getElementById('ziptbl').innerHTML =
+   '<tr>'+th('zip','ZIP')+th('area','Area')+th('lsa','LSA spend')+th('meta','Meta spend')+th('spend','Total spend')+
+   th('leads','Leads')+th('cpl','Cost / lead')+th('booked','Booked')+th('cpb','Cost / booked')+th('won','Revenue')+th('roas','Return')+'<th>Reading</th></tr>'
+   + rows.map(r=>`<tr>
+      <td><b>${r.zip}</b></td><td>${r.area}</td>
+      <td class="n">${r.lsa?money(r.lsa):'—'}</td><td class="n">${r.meta?money(r.meta):'—'}</td>
+      <td class="n"><b>${r.spend?money(r.spend):'—'}</b><div class="bar"><i style="width:${r.spend/maxS*100}%"></i></div></td>
+      <td class="n">${r.leads||'—'}</td><td class="n">${r.cpl?money(Math.round(r.cpl)):'—'}</td>
+      <td class="n">${r.booked||'—'}</td><td class="n">${r.cpb?money(Math.round(r.cpb)):'—'}</td>
+      <td class="n"><b>${r.won?money(r.won):'—'}</b><div class="bar gold"><i style="width:${r.won/maxW*100}%"></i></div></td>
+      <td class="n">${r.spend?(r.roas?r.roas.toFixed(1)+'x':'0.0x'):(r.won?'—':'—')}</td>
+      <td>${verdict(r)}</td></tr>`).join('')
+   + `<tr class="tot"><td colspan="2">All ZIPs</td><td class="n">${money(tot.lsa)}</td><td class="n">${money(tot.meta)}</td>
+      <td class="n"><b>${money(tot.spend)}</b></td><td class="n"><b>${tot.leads}</b></td>
+      <td class="n">${tot.leads?money(Math.round(tot.spend/tot.leads)):'—'}</td><td class="n"><b>${tot.booked}</b></td>
+      <td class="n">${tot.booked?money(Math.round(tot.spend/tot.booked)):'—'}</td><td class="n"><b>${money(tot.won)}</b></td>
+      <td class="n">${tot.spend?(tot.won/tot.spend).toFixed(1)+'x':'—'}</td><td></td></tr>`;
+}
+function zset(k){zsort.dir = (zsort.k===k? -zsort.dir : -1); zsort.k=k; renderZips();}
+function render(){renderKpis();renderKan();renderChan();renderQueue();renderZips();save()}
 
 function openLead(id){
   active=leads.find(l=>l.id===id);
   document.getElementById('d-name').textContent=active.name;
-  document.getElementById('d-meta').textContent=`${active.area} · ${active.svc} · ${money(active.val)} · ${active.ch}`;
+  document.getElementById('d-meta').textContent=`${active.area} ${active.zip||''} · ${active.svc} · ${money(active.val)} · ${active.ch}`;
   document.getElementById('d-stages').innerHTML=STAGES.map(s=>`<div class="chip ${s===active.stage?'on':''}" onclick="setStage('${s}')">${s}</div>`).join('');
   document.getElementById('d-date').value=active.fu||'';
   document.getElementById('d-log').innerHTML=active.notes.map(n=>`<div class="log"><b>${n.k}</b> · ${n.d}<br>${n.t}</div>`).join('');
@@ -276,7 +366,7 @@ const NEW=[['Jenna Powell','Goodyear','LSA','Roof inspection + quote',12400],['C
 let ni=0;
 function simulateLead(){
   const n=NEW[ni++%NEW.length];
-  const l={id:Date.now(),name:n[0],area:n[1],ch:n[2],svc:n[3],val:n[4],stage:'New',fu:today(),fresh:true,notes:[{t:'Inbound from '+n[2]+' — new lead captured',k:'System',d:today()}]};
+  const l={id:Date.now(),name:n[0],area:n[1],ch:n[2],svc:n[3],val:n[4],zip:ZIPMAP[n[1]]||'—',stage:'New',fu:today(),fresh:true,notes:[{t:'Inbound from '+n[2]+' — new lead captured',k:'System',d:today()}]};
   leads.unshift(l);render();toast('New '+n[2]+' lead: '+n[0]);
 }
 function exportCsv(){
