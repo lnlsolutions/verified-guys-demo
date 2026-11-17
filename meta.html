@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Verified Guys — Meta Ads Preview</title>
+<style>
+:root{--navy:#0D2D6E;--blue:#3A84F6;--blue2:#1857C5;--gold:#F5B73B;--bg:#F4F7FE;--ink:#12203A;--muted:#64748B;--line:#DDE5F5}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+.bar{background:var(--navy);color:#C9D8F2;padding:11px 22px;display:flex;align-items:center;gap:14px;font-size:12.5px;font-weight:600}
+.bar b{color:#fff}.bar .sp{flex:1}.bar a{color:#C9D8F2;margin-left:14px}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 22px 70px}
+h1{font-size:26px;letter-spacing:-.7px;margin:0 0 6px}
+.lede{color:#4B5E7D;font-size:14px;max-width:780px;line-height:1.6;margin-bottom:8px}
+.mock-note{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#8A5B00;background:#FDF3DC;border:1px solid #F3DCA6;padding:4px 9px;border-radius:99px;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:340px 340px 1fr;gap:22px;align-items:start}
+/* feed card */
+.fb{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 14px 40px rgba(13,45,110,.1)}
+.fb .hd{display:flex;align-items:center;gap:9px;padding:11px 13px}
+.fb .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(140deg,var(--blue),var(--navy));display:grid;place-items:center;color:#fff;font-weight:800;font-size:11px}
+.fb .nm{font-size:12.6px;font-weight:700}
+.fb .meta{font-size:10.4px;color:#8A94A6;font-weight:600}
+.fb .copy{padding:0 13px 11px;font-size:12.4px;line-height:1.5}
+.fb .creative{height:210px;background:linear-gradient(160deg,#12345F,#0D2D6E 55%,#1D4E8F);position:relative;display:grid;place-items:center;color:#fff;text-align:center;padding:18px}
+.fb .creative .k{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#F5B73B;font-weight:800;margin-bottom:8px}
+.fb .creative h3{margin:0;font-size:19px;line-height:1.25;letter-spacing:-.4px;max-width:250px}
+.fb .creative p{font-size:11.4px;color:#C9D8F2;margin:9px 0 0;max-width:230px}
+.fb .cta-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-top:1px solid #EDF0F5}
+.fb .cta-bar .l{font-size:11px;color:#5F6B7D;font-weight:600}
+.fb .cta-bar .b{background:#1877F2;color:#fff;font-size:11.6px;font-weight:700;padding:7px 13px;border-radius:7px}
+.fb .eng{display:flex;gap:16px;padding:9px 13px;border-top:1px solid #EDF0F5;font-size:11px;color:#5F6B7D;font-weight:600}
+/* story */
+.story{width:100%;aspect-ratio:9/16;border-radius:18px;background:linear-gradient(175deg,#0D2D6E,#12345F 60%,#0A1F3D);position:relative;overflow:hidden;box-shadow:0 14px 40px rgba(13,45,110,.2);color:#fff;padding:16px;display:flex;flex-direction:column}
+.story .top{display:flex;gap:4px;margin-bottom:12px}
+.story .top i{flex:1;height:2.5px;background:rgba(255,255,255,.35);border-radius:2px;display:block}
+.story .acct{display:flex;align-items:center;gap:8px;font-size:11.2px;font-weight:700}
+.story .acct div{width:26px;height:26px;border-radius:50%;background:linear-gradient(140deg,var(--blue),var(--gold));display:grid;place-items:center;color:#0D2D6E;font-size:9px;font-weight:800}
+.story .mid{margin-top:auto;margin-bottom:auto}
+.story .mid .k{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.story .mid h3{font-size:22px;line-height:1.2;letter-spacing:-.5px;margin:8px 0 0}
+.story .mid p{font-size:11.6px;color:#B9CBEC;margin:9px 0 0;line-height:1.5}
+.story .swipe{background:#fff;color:#0D2D6E;text-align:center;font-size:12.6px;font-weight:800;padding:11px;border-radius:9px;margin-top:16px}
+/* right col */
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+.card h2{font-size:13px;letter-spacing:.02em;margin:0 0 3px;text-transform:uppercase;color:#2A3E63}
+.card .sub{font-size:11.8px;color:var(--muted);margin-bottom:13px}
+table{width:100%;border-collapse:collapse;font-size:12.2px}
+th{text-align:left;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:7px;border-bottom:1px solid var(--line)}
+td{padding:8px 7px;border-bottom:1px solid #EDF1FA;font-weight:500;vertical-align:top}
+td.n{font-variant-numeric:tabular-nums;font-weight:700}
+tr:last-child td{border-bottom:0}
+ul{margin:8px 0 0;padding-left:18px;font-size:12.4px;line-height:1.75;color:#33445F}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pill{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:5px;background:#EFE8FE;color:#5B2CC9}
+</style>
+</head>
+<body>
+<div class="bar"><b>The Verified Guys</b><span>Growth system</span><span class="sp"></span><a href="launch.html">Launch plan</a><a href="crm-live.html">Live CRM</a><a href="lsa.html">LSA preview</a></div>
+<div class="wrap">
+  <h1>Meta ads</h1>
+  <p class="lede">Facebook and Instagram creative for homeowners who already have a roof problem but have not started shopping yet, plus the lead form that writes straight into the CRM.</p>
+  <div class="mock-note">Preview mockup · illustrative figures</div>
+
+  <div class="grid">
+    <div>
+      <div class="fb">
+        <div class="hd"><div class="av">VG</div><div><div class="nm">The Verified Guys</div><div class="meta">Sponsored · Phoenix, AZ</div></div></div>
+        <div class="copy">Storm season did a number on Valley roofs. We roof and we do our own electrical — solar detach, panel work, all of it. No subcontractors.</div>
+        <div class="creative">
+          <div>
+            <div class="k">Dual licensed</div>
+            <h3>One crew for the roof and the panel.</h3>
+            <p>Free inspection · ROC #358547 · #361063</p>
+          </div>
+        </div>
+        <div class="cta-bar"><div class="l">theverifiedguys.com</div><div class="b">Get quote</div></div>
+        <div class="eng"><span>♡ 214</span><span>💬 38</span><span>↗ 27</span></div>
+      </div>
+      <div style="font-size:11.4px;color:#64748B;margin-top:12px;line-height:1.6"><b style="color:#12203A">Feed ad, 1:1.</b> Leads with the differentiator, not the discount. Solar detach and reset is the hook that separates them from every roofer bidding on the same ZIP.</div>
+    </div>
+
+    <div>
+      <div class="story">
+        <div class="top"><i></i><i></i><i></i></div>
+        <div class="acct"><div>VG</div> The Verified Guys</div>
+        <div class="mid">
+          <div class="k">Roof + solar</div>
+          <h3>Solar panels off. Roof on. Same crew.</h3>
+          <p>Most roofers make you hire a separate solar company. We don't.</p>
+        </div>
+        <div class="swipe">Get my free inspection</div>
+      </div>
+      <div style="font-size:11.4px;color:#64748B;margin-top:12px;line-height:1.6"><b style="color:#12203A">Story, 9:16.</b> Same promise, cut for Stories and Reels. Swipe opens the instant form inside the app.</div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>Campaign structure</h2>
+        <div class="sub">Three campaigns, tight audiences, no broad blanket spend</div>
+        <table>
+          <tr><th>Campaign</th><th>Audience</th><th>Daily</th><th>Projected CPL</th></tr>
+          <tr><td><b>Roof replacement</b> <span class="pill">Lead form</span></td><td>Homeowners 35-65, Phoenix metro, home value band set</td><td class="n">$25</td><td class="n">$28 – $42</td></tr>
+          <tr><td><b>Solar detach + reset</b> <span class="pill">Lead form</span></td><td>Homeowners with rooftop solar, 12-mile radius of service core</td><td class="n">$15</td><td class="n">$22 – $34</td></tr>
+          <tr><td><b>Retargeting</b> <span class="pill">Traffic</span></td><td>Site visitors and video viewers, 30 days</td><td class="n">$8</td><td class="n">$9 – $16</td></tr>
+        </table>
+        <div style="font-size:11.4px;color:#64748B;margin-top:11px">At $48 a day this models 34 to 48 leads a month before any optimization, with roofing and solar split so neither one hides the other.</div>
+      </div>
+
+      <div class="card">
+        <h2>Lead form</h2>
+        <div class="sub">Four fields. Anything longer and volume collapses.</div>
+        <table>
+          <tr><td style="width:46%"><b>What do you need?</b></td><td>Roof · Solar detach · Electrical · Not sure</td></tr>
+          <tr><td><b>ZIP code</b></td><td>Text field, validated against service area</td></tr>
+          <tr><td><b>Name and phone</b></td><td>Prefilled from the Meta profile</td></tr>
+          <tr><td><b>Best time</b></td><td>Morning · Afternoon · Evening</td></tr>
+        </table>
+        <div style="font-size:11.4px;color:#64748B;margin-top:11px">Submits instantly into the CRM as a new lead, source stamped Meta, with the follow-up queue set for the same day.</div>
+      </div>
+
+      <div class="two">
+        <div class="card">
+          <h2>Creative we test first</h2>
+          <ul>
+            <li>Dual license: one crew for roof and panel</li>
+            <li>Photo of a real tear-off with solar stacked and labeled</li>
+            <li>15-second owner-to-camera on why they do both trades</li>
+            <li>Cost of a second contractor trip when solar is bolted through</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Guardrails</h2>
+          <ul>
+            <li>No "free roof" or insurance-fraud framing</li>
+            <li>No before and after without written permission</li>
+            <li>License numbers in every ad that names a service</li>
+            <li>Leads answered inside 5 minutes or the budget pauses</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>First 30 days</h2>
+        <table>
+          <tr><th>Week</th><th>Focus</th><th>Target</th></tr>
+          <tr><td>1</td><td>Pixel and lead form live, two creatives per campaign, $48 a day</td><td>12+ leads</td></tr>
+          <tr><td>2</td><td>Kill the losing creative, add the owner video</td><td>CPL under $40</td></tr>
+          <tr><td>3</td><td>Retargeting on, lookalike from booked estimates</td><td>8+ booked estimates</td></tr>
+          <tr><td>4</td><td>Shift budget to the service with the best cost per booked estimate</td><td>Cost per estimate under $150</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
