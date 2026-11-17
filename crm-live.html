@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Verified Guys — Live CRM</title>
+<style>
+:root{--navy:#0D2D6E;--blue:#3A84F6;--blue2:#1857C5;--gold:#F5B73B;--bg:#F4F7FE;--card:#fff;--ink:#12203A;--muted:#64748B;--line:#DDE5F5;--green:#12A150;--red:#DC2B2B}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{display:flex;min-height:100vh}
+/* rail */
+.rail{width:212px;background:var(--navy);color:#C9D8F2;padding:18px 14px;flex:0 0 212px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.rail .logo{display:flex;align-items:center;gap:9px;padding:4px 6px 16px}
+.rail .logo b{color:#fff;font-size:14px;letter-spacing:-.2px;line-height:1.15}
+.rail .logo span{display:block;font-size:9.5px;color:#8FA9D4;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(140deg,var(--blue),var(--gold));display:grid;place-items:center;font-weight:800;color:#0D2D6E;font-size:13px}
+.navi{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;font-size:12.6px;font-weight:600;color:#B9CBEC;cursor:pointer;transition:.15s}
+.navi:hover{background:rgba(255,255,255,.07);color:#fff}
+.navi.on{background:#fff;color:var(--navy)}
+.rail .foot{margin-top:auto;font-size:10.5px;color:#7E97C4;line-height:1.5;padding:10px 8px}
+.rail .foot b{color:#C9D8F2}
+/* main */
+main{flex:1;min-width:0}
+.top{background:#fff;border-bottom:1px solid var(--line);padding:13px 22px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:20}
+.top h1{font-size:15.5px;margin:0;letter-spacing:-.2px}
+.top .crumb{font-size:11.5px;color:var(--muted);font-weight:600}
+.pill{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:99px;background:#E6F6EC;color:#0B7A3C;border:1px solid #BFE6CE}
+.spacer{flex:1}
+.btn{border:0;border-radius:9px;padding:9px 14px;font-size:12.4px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn.primary{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(58,132,246,.28)}
+.btn.primary:hover{background:var(--blue2)}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.btn.gold{background:var(--gold);color:#3A2A05}
+.pad{padding:20px 22px 60px}
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 14px}
+.kpi .l{font-size:10.4px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-size:23px;font-weight:800;letter-spacing:-.7px;margin-top:5px}
+.kpi .d{font-size:11px;font-weight:600;color:var(--green);margin-top:3px}
+.kpi .d.warn{color:#B45309}
+/* grid */
+.grid{display:grid;grid-template-columns:1fr 320px;gap:14px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px 16px}
+.card h2{font-size:12.2px;margin:0 0 3px;letter-spacing:-.1px}
+.card .sub{font-size:11px;color:var(--muted);margin-bottom:11px;font-weight:500}
+/* kanban */
+.kan{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.col{background:#EEF3FD;border:1px solid var(--line);border-radius:11px;padding:9px;min-height:120px}
+.col h3{margin:0 0 8px;font-size:10.6px;letter-spacing:.07em;text-transform:uppercase;color:#3D5480;display:flex;justify-content:space-between}
+.col h3 span{background:#fff;border-radius:6px;padding:1px 6px;font-size:10px;color:var(--muted)}
+.lead{background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 10px;margin-bottom:7px;cursor:pointer;transition:.15s;box-shadow:0 1px 2px rgba(13,45,110,.04)}
+.lead:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(13,45,110,.1);border-color:#BFD3F5}
+.lead b{font-size:12.2px;display:block;letter-spacing:-.1px}
+.lead .m{font-size:10.6px;color:var(--muted);margin-top:2px;font-weight:600}
+.lead .tag{display:inline-block;font-size:9.4px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:5px;margin-top:6px}
+.tag.LSA{background:#E7F0FE;color:#1857C5}
+.tag.Meta{background:#EFE8FE;color:#5B2CC9}
+.tag.Google{background:#E9F7EE;color:#0B7A3C}
+.tag.Referral{background:#FDF3DC;color:#8A5B00}
+.lead.new{animation:pop .5s ease}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+/* table */
+table{width:100%;border-collapse:collapse;font-size:11.6px}
+th{text-align:left;font-size:9.8px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:6px 7px;border-bottom:1px solid var(--line)}
+td{padding:7px;border-bottom:1px solid #EDF1FA;font-weight:500}
+td.n{font-variant-numeric:tabular-nums;font-weight:700}
+tr:last-child td{border-bottom:0}
+.bar{height:6px;border-radius:99px;background:#E8EEFA;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--gold))}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(9,24,54,.42);opacity:0;pointer-events:none;transition:.2s;z-index:40}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:-430px;width:410px;height:100vh;background:#fff;z-index:50;transition:.26s cubic-bezier(.4,0,.2,1);box-shadow:-18px 0 44px rgba(9,24,54,.18);display:flex;flex-direction:column}
+.drawer.on{right:0}
+.drawer .dh{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:10px}
+.drawer .dh h3{margin:0;font-size:15px;letter-spacing:-.2px}
+.drawer .dh .m{font-size:11.4px;color:var(--muted);margin-top:3px;font-weight:600}
+.x{margin-left:auto;border:0;background:#F1F5FD;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:15px;color:#41546F}
+.db{padding:16px 18px;overflow:auto;flex:1}
+.dsec{margin-bottom:16px}
+.dsec .lb{font-size:9.8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:11px;font-weight:700;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:#F7FAFF;cursor:pointer}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+textarea{width:100%;min-height:74px;border:1px solid var(--line);border-radius:9px;padding:9px;font-family:inherit;font-size:12.2px;resize:vertical}
+input[type=date],select{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 9px;font-family:inherit;font-size:12.2px;background:#fff}
+.log{font-size:11.6px;color:#41546F;border-left:2px solid var(--line);padding:0 0 0 10px;margin-bottom:8px;line-height:1.5}
+.log b{color:var(--ink)}
+.df{padding:13px 18px;border-top:1px solid var(--line);display:flex;gap:8px}
+/* toast */
+.toast{position:fixed;left:50%;transform:translate(-50%,20px);bottom:26px;background:var(--navy);color:#fff;padding:11px 16px;border-radius:11px;font-size:12.4px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:0 12px 30px rgba(9,24,54,.3)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.kan{grid-template-columns:repeat(2,1fr)}.rail{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="rail">
+    <div class="logo"><div class="mark">VG</div><div><b>The Verified Guys</b><span>Client portal</span></div></div>
+    <a class="navi on" href="crm-live.html">◎ Pipeline</a>
+    <a class="navi" href="#channels">◇ Channels</a>
+    <a class="navi" href="lsa.html">◉ LSA mock</a>
+    <a class="navi" href="meta.html">◉ Meta mock</a>
+    <a class="navi" href="launch.html">▤ Launch plan</a>
+    <a class="navi" href="index.html">↗ Main site</a>
+    <div class="foot"><b>Live demo workspace</b><br>Data is stored in this browser. Nothing here touches production until you approve launch.</div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div>
+        <div class="crumb">Operations · Phoenix metro</div>
+        <h1>Pipeline</h1>
+      </div>
+      <span class="pill">Live</span>
+      <div class="spacer"></div>
+      <button class="btn ghost" onclick="exportCsv()">Export CSV</button>
+      <button class="btn primary" onclick="simulateLead()">Simulate inbound lead</button>
+    </div>
+
+    <div class="pad">
+      <div class="kpis" id="kpis"></div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Pipeline</h2>
+          <div class="sub">Click a lead to open it. Change stage, log a call, set the next follow-up.</div>
+          <div class="kan" id="kan"></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card" id="channels">
+            <h2>Channel performance</h2>
+            <div class="sub">Month to date. LSA and Meta are modeled on the plans in this kit.</div>
+            <table id="chan"></table>
+          </div>
+          <div class="card">
+            <h2>Follow-up queue</h2>
+            <div class="sub">Due today or overdue</div>
+            <div id="queue"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="dh">
+    <div>
+      <h3 id="d-name">Lead</h3>
+      <div class="m" id="d-meta"></div>
+    </div>
+    <button class="x" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="db">
+    <div class="dsec"><div class="lb">Stage</div><div class="chips" id="d-stages"></div></div>
+    <div class="dsec"><div class="lb">Next follow-up</div><input type="date" id="d-date" onchange="saveDate()"></div>
+    <div class="dsec"><div class="lb">Add note</div><textarea id="d-note" placeholder="Called, left voicemail about the inspection window…"></textarea>
+      <div style="display:flex;gap:7px;margin-top:8px">
+        <button class="btn primary" onclick="addNote('Note')">Save note</button>
+        <button class="btn ghost" onclick="addNote('Call')">Log call</button>
+        <button class="btn ghost" onclick="addNote('Text')">Log text</button>
+      </div>
+    </div>
+    <div class="dsec"><div class="lb">Activity</div><div id="d-log"></div></div>
+  </div>
+  <div class="df"><button class="btn gold" style="flex:1" onclick="advance()">Move to next stage</button></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const STAGES=['New','Contacted','Estimate','Won'];
+const SEED=[
+ {id:1,name:'Marcus Hale',area:'Ahwatukee',ch:'LSA',svc:'Roof replacement · solar detach/reset',val:18400,stage:'New',fu:today(),notes:[{t:'Lead came in from Local Services, 7:42am',k:'System',d:today()}]},
+ {id:2,name:'Danielle Ortiz',area:'Gilbert',ch:'Meta',svc:'Roof + solar quote',val:22600,stage:'New',fu:today(),notes:[{t:'Clicked Instagram lead form, requested evening call',k:'System',d:today()}]},
+ {id:3,name:'Ray Whitfield',area:'Chandler',ch:'LSA',svc:'Panel upgrade',val:4200,stage:'Contacted',fu:tomorrow(),notes:[{t:'Spoke with homeowner, wants estimate Friday',k:'Call',d:today()}]},
+ {id:4,name:'Priya Raman',area:'Scottsdale',ch:'Referral',svc:'Full roof, tile',val:31500,stage:'Estimate',fu:inDays(2),notes:[{t:'Estimate delivered, reviewing with spouse',k:'Note',d:today()}]},
+ {id:5,name:'Tom & Alyssa Beck',area:'Queen Creek',ch:'Meta',svc:'Roof replacement',val:19750,stage:'Estimate',fu:tomorrow(),notes:[{t:'Insurance adjuster scheduled Thursday',k:'Note',d:today()}]},
+ {id:6,name:'Gil Marquez',area:'Mesa',ch:'Google',svc:'Roof repair',val:1450,stage:'Won',fu:'',notes:[{t:'Signed, deposit collected',k:'Note',d:today()}]},
+ {id:7,name:'Sandra Coyne',area:'Peoria',ch:'LSA',svc:'Solar detach/reset',val:2600,stage:'Won',fu:'',notes:[{t:'Paid in full',k:'Note',d:today()}]},
+ {id:8,name:'Derrick Nash',area:'Tempe',ch:'Meta',svc:'Electrical panel + roof',val:8900,stage:'Contacted',fu:inDays(3),notes:[{t:'Left voicemail, texted intro',k:'Text',d:today()}]}
+];
+const CHAN=[{k:'LSA',spend:1450,proj:true},{k:'Meta',spend:1100,proj:true},{k:'Google',spend:620,proj:false},{k:'Referral',spend:0,proj:false}];
+
+function today(){return new Date().toISOString().slice(0,10)}
+function tomorrow(){return inDays(1)}
+function inDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+function load(){try{const s=localStorage.getItem('vg_crm_v2');if(s)return JSON.parse(s)}catch(e){}return JSON.parse(JSON.stringify(SEED))}
+function save(){localStorage.setItem('vg_crm_v2',JSON.stringify(leads))}
+let leads=load(), active=null;
+
+function money(n){return '$'+n.toLocaleString('en-US')}
+
+function renderKpis(){
+  const mtd=leads.length;
+  const est=leads.filter(l=>['Estimate','Won'].includes(l.stage));
+  const won=leads.filter(l=>l.stage==='Won');
+  const pipe=leads.filter(l=>l.stage!=='Won').reduce((s,l)=>s+l.val,0);
+  const rev=won.reduce((s,l)=>s+l.val,0);
+  const spend=CHAN.reduce((s,c)=>s+c.spend,0);
+  const cpl=spend/Math.max(mtd,1);
+  const close=mtd?Math.round(won.length/mtd*100):0;
+  document.getElementById('kpis').innerHTML=`
+  <div class="kpi"><div class="l">Leads MTD</div><div class="v">${mtd}</div><div class="d">${leads.filter(l=>l.fu&&l.fu<=today()).length} need follow-up</div></div>
+  <div class="kpi"><div class="l">Estimates booked</div><div class="v">${est.length}</div><div class="d">${Math.round(est.length/mtd*100)}% of leads</div></div>
+  <div class="kpi"><div class="l">Open pipeline</div><div class="v">${money(pipe)}</div><div class="d">Across ${leads.filter(l=>l.stage!=='Won').length} live leads</div></div>
+  <div class="kpi"><div class="l">Closed won</div><div class="v">${money(rev)}</div><div class="d">${close}% close rate</div></div>
+  <div class="kpi"><div class="l">Blended CPL</div><div class="v">$${Math.round(cpl)}</div><div class="d warn">${money(spend)} spend MTD</div></div>`;
+}
+
+function renderKan(){
+  const k=document.getElementById('kan');
+  k.innerHTML=STAGES.map(st=>{
+    const items=leads.filter(l=>l.stage===st);
+    return `<div class="col"><h3>${st}<span>${items.length}</span></h3>
+      ${items.map(l=>`<div class="lead ${l.fresh?'new':''}" onclick="openLead(${l.id})">
+        <b>${l.name}</b><div class="m">${l.area} · ${money(l.val)}</div>
+        <span class="tag ${l.ch}">${l.ch}</span>
+        ${l.fu?`<div class="m" style="margin-top:6px">↻ ${l.fu===today()?'Today':l.fu}</div>`:''}
+      </div>`).join('')||'<div class="m" style="font-size:10.5px;color:#8B9AB5;padding:6px 2px">Nothing here</div>'}
+    </div>`;
+  }).join('');
+  leads.forEach(l=>delete l.fresh);
+}
+
+function renderChan(){
+  const rows=CHAN.map(c=>{
+    const ls=leads.filter(l=>l.ch===c.k);
+    const cpl=ls.length?(c.spend/ls.length):0;
+    const won=ls.filter(l=>l.stage==='Won').reduce((s,l)=>s+l.val,0);
+    const roi=c.spend?(won/c.spend).toFixed(1)+'x':'—';
+    const max=Math.max(...CHAN.map(x=>x.spend),1);
+    return `<tr><td><b>${c.k}</b>${c.proj?' <span style="font-size:9px;color:#8A5B00;font-weight:800">MODELED</span>':''}</td>
+      <td class="n">${money(c.spend)}<div class="bar"><i style="width:${c.spend/max*100}%"></i></div></td>
+      <td class="n">${ls.length}</td><td class="n">${cpl?money(Math.round(cpl)):'—'}</td><td class="n">${won?money(won):'—'}</td><td class="n">${roi}</td></tr>`;
+  }).join('');
+  document.getElementById('chan').innerHTML='<tr><th>Channel</th><th>Spend</th><th>Leads</th><th>CPL</th><th>Won</th><th>ROI</th></tr>'+rows;
+}
+
+function renderQueue(){
+  const q=leads.filter(l=>l.fu&&l.fu<=today()).sort((a,b)=>a.fu.localeCompare(b.fu));
+  document.getElementById('queue').innerHTML=q.length?q.map(l=>`<div class="lead" onclick="openLead(${l.id})"><b>${l.name}</b><div class="m">${l.area} · ${l.svc}</div><div class="m" style="color:#B45309;font-weight:700">${l.fu<today()?'Overdue':'Due today'}</div></div>`).join(''):'<div class="m" style="font-size:11px;color:#8B9AB5">Clear for today.</div>';
+}
+
+function render(){renderKpis();renderKan();renderChan();renderQueue();save()}
+
+function openLead(id){
+  active=leads.find(l=>l.id===id);
+  document.getElementById('d-name').textContent=active.name;
+  document.getElementById('d-meta').textContent=`${active.area} · ${active.svc} · ${money(active.val)} · ${active.ch}`;
+  document.getElementById('d-stages').innerHTML=STAGES.map(s=>`<div class="chip ${s===active.stage?'on':''}" onclick="setStage('${s}')">${s}</div>`).join('');
+  document.getElementById('d-date').value=active.fu||'';
+  document.getElementById('d-log').innerHTML=active.notes.map(n=>`<div class="log"><b>${n.k}</b> · ${n.d}<br>${n.t}</div>`).join('');
+  document.getElementById('scrim').classList.add('on');
+  document.getElementById('drawer').classList.add('on');
+}
+function closeDrawer(){document.getElementById('scrim').classList.remove('on');document.getElementById('drawer').classList.remove('on');active=null}
+function setStage(s){active.stage=s;active.notes.unshift({t:'Stage changed to '+s,k:'System',d:today()});openLead(active.id);render();toast('Moved to '+s)}
+function saveDate(){active.fu=document.getElementById('d-date').value;render();toast('Follow-up set')}
+function addNote(kind){
+  const v=document.getElementById('d-note').value.trim(); if(!v&&kind==='Note'){toast('Write a note first');return}
+  active.notes.unshift({t:v||kind+' logged',k:kind,d:today()});
+  document.getElementById('d-note').value='';openLead(active.id);render();toast(kind+' added');
+}
+function advance(){
+  const i=STAGES.indexOf(active.stage);
+  if(i<STAGES.length-1){active.stage=STAGES[i+1];active.notes.unshift({t:'Advanced to '+active.stage,k:'System',d:today()});openLead(active.id);render();toast('Now in '+active.stage)}
+  else toast('Already closed won');
+}
+const NEW=[['Jenna Powell','Goodyear','LSA','Roof inspection + quote',12400],['Curtis Lang','Apache Junction','Meta','Roof replacement',16900],['Marisol Vega','Laveen','Meta','Solar detach/reset',2950],['Owen Brady','Fountain Hills','LSA','Tile roof repair',5400]];
+let ni=0;
+function simulateLead(){
+  const n=NEW[ni++%NEW.length];
+  const l={id:Date.now(),name:n[0],area:n[1],ch:n[2],svc:n[3],val:n[4],stage:'New',fu:today(),fresh:true,notes:[{t:'Inbound from '+n[2]+' — new lead captured',k:'System',d:today()}]};
+  leads.unshift(l);render();toast('New '+n[2]+' lead: '+n[0]);
+}
+function exportCsv(){
+  const rows=[['Name','Area','Channel','Service','Value','Stage','Follow-up','Notes']];
+  leads.forEach(l=>rows.push([l.name,l.area,l.ch,l.svc,l.val,l.stage,l.fu||'',l.notes.map(n=>n.k+': '+n.t).join(' | ')]));
+  const csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='verified-guys-leads.csv';a.click();
+  toast('CSV exported');
+}
+let tt;
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),2200)}
+render();
+</script>
+</body>
+</html>
