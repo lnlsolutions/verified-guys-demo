@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Verified Guys — Local Services Ads Preview</title>
+<style>
+:root{--navy:#0D2D6E;--blue:#3A84F6;--blue2:#1857C5;--gold:#F5B73B;--bg:#F4F7FE;--ink:#12203A;--muted:#64748B;--line:#DDE5F5}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+.bar{background:var(--navy);color:#C9D8F2;padding:11px 22px;display:flex;align-items:center;gap:14px;font-size:12.5px;font-weight:600}
+.bar b{color:#fff}.bar .sp{flex:1}.bar a{color:#C9D8F2;margin-left:14px}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 22px 70px}
+h1{font-size:26px;letter-spacing:-.7px;margin:0 0 6px}
+.lede{color:#4B5E7D;font-size:14px;max-width:760px;line-height:1.6;margin-bottom:8px}
+.mock-note{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#8A5B00;background:#FDF3DC;border:1px solid #F3DCA6;padding:4px 9px;border-radius:99px;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:360px 1fr;gap:26px;align-items:start}
+/* phone */
+.phone{background:#0B1B33;border-radius:34px;padding:11px;box-shadow:0 24px 60px rgba(13,45,110,.25);position:sticky;top:20px}
+.screen{background:#fff;border-radius:26px;overflow:hidden}
+.gbar{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid #EDF0F5}
+.glogo{font-size:19px;font-weight:700;letter-spacing:-1px}
+.glogo span:nth-child(1){color:#4285F4}.glogo span:nth-child(2){color:#EA4335}.glogo span:nth-child(3){color:#FBBC05}.glogo span:nth-child(4){color:#4285F4}.glogo span:nth-child(5){color:#34A853}.glogo span:nth-child(6){color:#EA4335}
+.search{flex:1;background:#F1F3F4;border-radius:99px;padding:7px 12px;font-size:12px;color:#5F6368}
+.tabs{display:flex;gap:16px;padding:10px 14px 0;font-size:11.8px;font-weight:600;color:#5F6368;border-bottom:1px solid #EDF0F5}
+.tabs .on{color:var(--blue2);border-bottom:2px solid var(--blue2);padding-bottom:8px}
+.lsa{padding:12px 14px}
+.lsa .hd{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;color:#3C4043;margin-bottom:9px}
+.gg{background:#E8F0FE;color:#1A73E8;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.03em}
+.biz{border:1px solid #E3E7ED;border-radius:12px;padding:11px;margin-bottom:9px}
+.biz.top{border-color:#1A73E8;border-width:1.5px;box-shadow:0 2px 10px rgba(26,115,232,.12)}
+.biz .r{display:flex;gap:9px}
+.av{width:38px;height:38px;border-radius:9px;background:linear-gradient(140deg,var(--blue),var(--navy));display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800}
+.biz b{font-size:13px;letter-spacing:-.2px}
+.biz .s{font-size:10.6px;color:#5F6368;margin-top:2px;font-weight:600}
+.stars{font-size:10.4px;color:#E37400;font-weight:700;margin-top:3px}
+.stars span{color:#5F6368;font-weight:600}
+.badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.bd{font-size:8.6px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E6F4EA;color:#137333}
+.bd.grey{background:#F1F3F4;color:#3C4043}
+.cta{display:flex;gap:6px;margin-top:9px}
+.cta div{flex:1;text-align:center;font-size:11px;font-weight:700;padding:7px;border-radius:7px;border:1px solid #DADCE0;color:#1A73E8}
+.cta .fill{background:#1A73E8;color:#fff;border-color:#1A73E8}
+.res{padding:0 14px 14px}
+.res .it{padding:9px 0;border-top:1px solid #EDF0F5;font-size:11.5px}
+.res .it b{display:block;font-size:12px;color:#202124}
+.res .it span{color:#5F6368;font-size:10.5px}
+/* right */
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+.card h2{font-size:13px;letter-spacing:.02em;margin:0 0 3px;text-transform:uppercase;color:#2A3E63}
+.card .sub{font-size:11.8px;color:var(--muted);margin-bottom:13px}
+table{width:100%;border-collapse:collapse;font-size:12.2px}
+th{text-align:left;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:7px;border-bottom:1px solid var(--line)}
+td{padding:8px 7px;border-bottom:1px solid #EDF1FA;font-weight:500}
+td.n{font-variant-numeric:tabular-nums;font-weight:700}
+tr:last-child td{border-bottom:0}
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;font-weight:700}
+.step{background:#EEF4FF;border:1px solid #CFE0FB;border-radius:10px;padding:9px 12px;color:#12408F}
+.ar{color:#9DB3D6;font-weight:800}
+ul{margin:8px 0 0;padding-left:18px;font-size:12.4px;line-height:1.75;color:#33445F}
+ul li{margin-bottom:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.tag{font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:#E7F0FE;color:#1857C5;padding:3px 7px;border-radius:5px}
+</style>
+</head>
+<body>
+<div class="bar"><b>The Verified Guys</b><span>Growth system</span><span class="sp"></span><a href="launch.html">Launch plan</a><a href="crm-live.html">Live CRM</a><a href="meta.html">Meta ads</a></div>
+<div class="wrap">
+  <h1>Google Local Services Ads</h1>
+  <p class="lede">A preview of how The Verified Guys appears at the top of Google for high-intent roofing searches in the Phoenix metro, and how every LSA lead lands in the CRM.</p>
+  <div class="mock-note">Preview mockup · illustrative figures</div>
+
+  <div class="grid">
+    <div class="phone">
+      <div class="screen">
+        <div class="gbar">
+          <div class="glogo"><span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span></div>
+          <div class="search">roof replacement phoenix</div>
+        </div>
+        <div class="tabs"><span class="on">Local Services</span><span>All</span><span>Maps</span></div>
+        <div class="lsa">
+          <div class="hd"><span class="gg">GOOGLE GUARANTEED</span> Top-rated pros near you</div>
+          <div class="biz top">
+            <div class="r">
+              <div class="av">VG</div>
+              <div>
+                <b>The Verified Guys</b>
+                <div class="s">Roofing · Electrical · Solar</div>
+                <div class="stars">★★★★★ <span>4.9 (94)</span></div>
+                <div class="badges"><span class="bd">Licensed</span><span class="bd">Insured</span><span class="bd grey">10+ yrs</span></div>
+              </div>
+            </div>
+            <div class="cta"><div class="fill">Call</div><div>Message</div><div>Book</div></div>
+          </div>
+          <div class="biz">
+            <div class="r"><div class="av" style="background:#64748B">RW</div><div><b>Redwood Roofing Co.</b><div class="s">Roofing</div><div class="stars">★★★★☆ <span>4.4 (51)</span></div></div></div>
+          </div>
+          <div class="biz">
+            <div class="r"><div class="av" style="background:#64748B">SP</div><div><b>Sun Peak Exteriors</b><div class="s">Roofing</div><div class="stars">★★★★☆ <span>4.3 (37)</span></div></div></div>
+          </div>
+        </div>
+        <div class="res">
+          <div class="it"><b>Roof Replacement &amp; Repair — Mesa, AZ</b><span>www.example-roofer.com</span></div>
+          <div class="it"><b>How much does a roof cost in Phoenix?</b><span>Local guide · 6 min read</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>What we run</h2>
+        <div class="sub">Local Services is pay-per-lead, not pay-per-click, and it sits above the standard search results.</div>
+        <table>
+          <tr><th>Setting</th><th>Plan</th></tr>
+          <tr><td>Services advertised</td><td>Roof replacement, roof repair, solar detach and reset, panel upgrades</td></tr>
+          <tr><td>Service areas</td><td>Phoenix, Scottsdale, Mesa, Gilbert, Chandler, Tempe, Queen Creek, Ahwatukee, Peoria</td></tr>
+          <tr><td>Weekly budget</td><td class="n">$420 – $650 to start</td></tr>
+          <tr><td>Projected leads</td><td class="n">12 – 18 per week</td></tr>
+          <tr><td>Projected cost per lead</td><td class="n">$36 – $52</td></tr>
+          <tr><td>Booked estimates</td><td class="n">6 – 9 per week</td></tr>
+          <tr><td>Response requirement</td><td>Answered calls, messages returned inside 5 minutes, business hours set</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>How a lead moves</h2>
+        <div class="sub">Every call, message and booking request becomes a CRM record with the source attached.</div>
+        <div class="flow">
+          <span class="step">LSA lead</span><span class="ar">→</span>
+          <span class="step">Call or message</span><span class="ar">→</span>
+          <span class="step">CRM record</span><span class="ar">→</span>
+          <span class="step">Follow-up queue</span><span class="ar">→</span>
+          <span class="step">Estimate booked</span>
+        </div>
+        <ul>
+          <li>Missed calls trigger an automatic text back within a minute, which is where most roofing leads are lost</li>
+          <li>Lead source is stamped on the record, so cost per booked estimate is real, not estimated</li>
+          <li>Weekly summary shows spend, leads, bookings and closed revenue by service</li>
+        </ul>
+      </div>
+
+      <div class="two">
+        <div class="card">
+          <h2>What we need to launch</h2>
+          <div class="sub">Roughly a week of setup on Google's side</div>
+          <ul>
+            <li>Google Guaranteed verification with ROC #358547 and #361063 on file</li>
+            <li>Certificate of insurance and business license upload</li>
+            <li>Service area list confirmed by ZIP</li>
+            <li>Call answering and message routing assigned to a named person</li>
+            <li>Review requests turned on after every completed job</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Why it wins here</h2>
+          <div class="sub">Phoenix roofing search is crowded and expensive per click</div>
+          <ul>
+            <li>Pay only for leads, so a slow month costs less</li>
+            <li>Google Guaranteed badge carries weight for insurance-driven roof decisions</li>
+            <li>Dual license in roofing and electrical is a real differentiator in the listing</li>
+            <li>Reviews compound: every finished job feeds the next lead</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>First 30 days</h2>
+        <table>
+          <tr><th>Week</th><th>Focus</th><th>Target</th></tr>
+          <tr><td>1</td><td>Verification submitted, service areas set, budget live at the low end</td><td>Account approved</td></tr>
+          <tr><td>2</td><td>Calls answered live, text-back on missed calls, first review push</td><td>10+ leads, 3 estimates</td></tr>
+          <tr><td>3</td><td>Raise budget on the services converting, cut the weak ZIPs</td><td>Cost per booked estimate under $140</td></tr>
+          <tr><td>4</td><td>Scale to target spend, weekly review with the team</td><td>18+ leads, 7+ estimates</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
