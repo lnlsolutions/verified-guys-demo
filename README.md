@@ -6,7 +6,7 @@ Two things live here:
 
 1. **`index.html`** — a modern, funnel-first rebuild of their public site, using their real copy,
    photos, reviews, service areas, and ROC numbers. Includes the **Verified Guy AI** chat widget.
-2. **`crm.html`** — the client-facing dashboard showing what their back end looks like from
+2. **`client-hub-7m3p8.html`** — the client-facing dashboard showing what their back end looks like from
    Google Ads, Local Services Ads, and Meta: spend, leads, CPL, CPA, booked revenue, ROAS,
    projects in production, and clickable job status.
 
